@@ -196,11 +196,11 @@
 <div class="nav-tabs">
     <div class="nav-tab active" onclick="switchTab('tab-new',this)">開單</div>
     <div class="nav-tab" onclick="switchTab('tab-daily',this)">今日</div>
-    <div class="nav-tab" onclick="switchTab('tab-chart',this)">圖表</div>
     <div class="nav-tab" onclick="switchTab('tab-monthly',this)">月報</div>
     <div class="nav-tab" onclick="switchTab('tab-history',this)">歷史</div>
+    <div class="nav-tab" onclick="switchTab('tab-chart',this)">淨利圖</div>
+    <div class="nav-tab" onclick="switchTab('tab-curve',this)">魔術曲線圖</div>
     <div class="nav-tab" onclick="switchTab('tab-settings',this)">設定</div>
-    <div class="nav-tab" onclick="switchTab('tab-curve',this)">曲線圖</div>
 </div>
 </div><!-- /topBar -->
 
@@ -387,8 +387,7 @@
     <!-- Sub tabs -->
     <div class="curve-sub-tabs">
         <button class="curve-sub-tab active" onclick="switchCurve('curve-input',this)">➕ 資料輸入</button>
-        <button class="curve-sub-tab" onclick="switchCurve('curve-profit',this)">💰 淨利圖</button>
-        <button class="curve-sub-tab" onclick="switchCurve('curve-fans',this)">👥 粉絲圖</button>
+        <button class="curve-sub-tab" onclick="switchCurve('curve-fans',this)">✨ 魔術曲線圖</button>
     </div>
 
     <!-- 資料輸入 -->
@@ -416,12 +415,6 @@
                     </select><span style="position:absolute;right:10px;top:50%;transform:translateY(-50%);color:var(--rose);pointer-events:none;font-size:.8rem;">▾</span></div>
                 </div>
             </div>
-            <div style="font-size:.75rem;font-weight:600;color:var(--text-sub);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px;">💰 淨利</div>
-            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px;">
-                <div class="input-group" style="margin-bottom:0;"><span class="input-label" style="color:#5BC8C0;">零售</span><input type="number" id="cv-retail" class="custom-input" placeholder="0" style="border-left:3px solid #5BC8C0;"></div>
-                <div class="input-group" style="margin-bottom:0;"><span class="input-label" style="color:#3B6EDE;">團隊</span><input type="number" id="cv-team" class="custom-input" placeholder="0" style="border-left:3px solid #3B6EDE;"></div>
-                <div class="input-group" style="margin-bottom:0;"><span class="input-label" style="color:#9B82D4;">返利</span><input type="number" id="cv-rebate" class="custom-input" placeholder="0" style="border-left:3px solid #9B82D4;"></div>
-            </div>
             <div style="font-size:.75rem;font-weight:600;color:var(--text-sub);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px;">👥 粉絲</div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;">
                 <div class="input-group" style="margin-bottom:0;"><span class="input-label" style="color:#5BC8C0;">TikTok</span><input type="number" id="cv-tiktok" class="custom-input" placeholder="0" style="border-left:3px solid #5BC8C0;"></div>
@@ -432,23 +425,6 @@
         <div class="card">
             <div class="card-header">月份資料（直接修改自動儲存）</div>
             <div id="curve-edit-table"></div>
-        </div>
-    </div>
-
-    <!-- 淨利圖 -->
-    <div class="curve-panel" id="curve-profit">
-        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;" id="curve-stats1"></div>
-        <div class="card">
-            <div class="card-header" id="curve-chart1-title">淨利曲線圖</div>
-            <div style="font-size:.73rem;color:var(--text-muted);margin-bottom:10px;" id="curve-chart1-sub">三口袋月度淨利堆疊長條圖</div>
-            <div class="curve-legend">
-                <div class="curve-legend-item"><div class="curve-legend-box" style="background:#5BC8C0"></div>第一口袋 零售</div>
-                <div class="curve-legend-item"><div class="curve-legend-box" style="background:#3B6EDE"></div>第二口袋 團隊</div>
-                <div class="curve-legend-item"><div class="curve-legend-box" style="background:#9B82D4"></div>第三口袋 返利</div>
-            </div>
-            <div class="chart-wrap-curve"><canvas id="curve-chart1"></canvas></div>
-            <div style="font-size:.72rem;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin:14px 0 8px;padding-top:14px;border-top:1px solid var(--border);">📋 月份明細</div>
-            <div id="curve-table1"></div>
         </div>
     </div>
 
@@ -1148,14 +1124,11 @@ function addCurveMonth(){
     const key = y + '-' + String(m).padStart(2,'0');
     if(curveDB[key]){ showToast('此月份已存在，請直接在表格修改'); return; }
     curveDB[key] = {
-        retail: parseInt(document.getElementById('cv-retail').value)||0,
-        team:   parseInt(document.getElementById('cv-team').value)||0,
-        rebate: parseInt(document.getElementById('cv-rebate').value)||0,
         tiktok: parseInt(document.getElementById('cv-tiktok').value)||0,
         ig:     parseInt(document.getElementById('cv-ig').value)||0,
     };
     saveCurveDB();
-    ['cv-retail','cv-team','cv-rebate','cv-tiktok','cv-ig'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+    ['cv-tiktok','cv-ig'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
     renderCurveTable();
     renderCurveCharts();
     showToast('✓ 已新增 ' + y + '年' + parseInt(m) + '月');
@@ -1167,9 +1140,6 @@ function renderCurveTable(){
     const keys = getCurveSortedKeys().slice().reverse();
     if(!keys.length){ wrap.innerHTML='<div style="text-align:center;padding:20px;font-size:.82rem;color:var(--text-muted)">尚未新增任何資料</div>'; return; }
     const fields=[
-        {key:'retail',label:'零售',color:'#5BC8C0'},
-        {key:'team',label:'團隊',color:'#3B6EDE'},
-        {key:'rebate',label:'返利',color:'#9B82D4'},
         {key:'tiktok',label:'TikTok',color:'#5BC8C0'},
         {key:'ig',label:'IG',color:'var(--rose)'},
     ];
@@ -1328,23 +1298,13 @@ function buildCurveDetailTable(wrapId, keys, colNames, colData, colors){
 function renderCurveCharts(){
     const keys=getCurveSortedKeys();
     if(!keys.length){
-        ['curve-chart1','curve-chart2'].forEach(clearCurveChart);
-        ['curve-table1','curve-table2','curve-stats1','curve-stats2'].forEach(id=>{ const el=document.getElementById(id); if(el) el.innerHTML=''; });
+        clearCurveChart('curve-chart2');
+        ['curve-table2','curve-stats2'].forEach(id=>{ const el=document.getElementById(id); if(el) el.innerHTML=''; });
         return;
     }
     const labels=keys.map(k=>{ const[y,m]=k.split('-'); return parseInt(m)+'月'; });
-    const retail=keys.map(k=>curveDB[k].retail||0);
-    const team=keys.map(k=>curveDB[k].team||0);
-    const rebate=keys.map(k=>curveDB[k].rebate||0);
     const tiktok=keys.map(k=>curveDB[k].tiktok||0);
     const ig=keys.map(k=>curveDB[k].ig||0);
-
-    buildCurveChart('curve-chart1',labels,[
-        {label:'第一口袋 零售',data:retail,backgroundColor:'#5BC8C0',borderWidth:0},
-        {label:'第二口袋 團隊',data:team,backgroundColor:'#3B6EDE',borderWidth:0},
-        {label:'第三口袋 返利',data:rebate,backgroundColor:'#9B82D4',borderWidth:0},
-    ]);
-    buildCurveDetailTable('curve-table1',keys,['零售','團隊','返利'],[retail,team,rebate],['#5BC8C0','#3B6EDE','#9B82D4']);
 
     const totF=tiktok.map((t,i)=>t+ig[i]);
     const dF=totF.map((v,i)=>i===0?null:v-totF[i-1]);
@@ -1357,12 +1317,7 @@ function renderCurveCharts(){
     // Stats
     const fmtN=n=>Number(n).toLocaleString('zh-TW');
     const dStr=(cur,prev)=>{ if(prev===null||prev===undefined) return ''; const d=cur-prev; return (d>0?'+':'')+fmtN(d); };
-    const s1=document.getElementById('curve-stats1');
     const s2=document.getElementById('curve-stats2');
-    if(s1) s1.innerHTML=[
-        {l:'最新月總淨利',v:fmtN(retail.at(-1)+team.at(-1)+rebate.at(-1)),s:dStr(retail.at(-1)+team.at(-1)+rebate.at(-1),keys.length>1?retail.at(-2)+team.at(-2)+rebate.at(-2):null)},
-        {l:'累計總淨利',v:fmtN([...retail,...team,...rebate].reduce((a,b)=>a+b,0))},
-    ].map(x=>`<div class="curve-stat"><div class="cs-label">${x.l}</div><div class="cs-val">${x.v}</div>${x.s?`<div class="cs-sub ${x.s.startsWith('+')?'delta-pos':x.s.startsWith('-')?'delta-neg':''}">${x.s}</div>`:''}</div>`).join('');
     if(s2) s2.innerHTML=[
         {l:'最新月總粉絲',v:fmtN(totF.at(-1)),s:dStr(totF.at(-1),keys.length>1?totF.at(-2):null)},
         {l:'TikTok',v:fmtN(tiktok.at(-1)),s:dStr(tiktok.at(-1),keys.length>1?tiktok.at(-2):null)},
