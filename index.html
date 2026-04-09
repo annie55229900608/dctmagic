@@ -1,1161 +1,1376 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-<meta charset="UTF-8">
-  <link rel="apple-touch-icon" href="https://annie55229900608.github.io/dctmagic/IMG_2688.PNG">
-  <link rel="icon" type="image/jpeg" href="https://annie55229900608.github.io/dctmagic/IMG_2688.PNG">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-title" content="DCT魔術曲線圖">
-    <link rel="apple-touch-icon" href="https://annie55229900608.github.io/dctmagic/IMG_2688.PNG">
-  <link rel="icon" type="image/jpeg" href="https://annie55229900608.github.io/dctmagic/IMG_2688.PNG">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-title" content="DCT魔術曲線圖">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DCT魔術曲線圖生成</title>
+    <meta charset="UTF-8">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>DCT Money</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --rose: #C8748A; --rose-light: #F2D9E0; --rose-pale: #FAF2F4; --rose-deep: #A05068;
+            --beige: #F7F3EE; --beige-dark: #EDE7DE; --text-main: #2C2226; --text-sub: #7A6872;
+            --text-muted: #B09EA8; --border: #E8DDE3; --white: #FFFFFF;
+            --c1: #5BC8C0; --c2: #3B6EDE; --shadow-sm: 0 1px 8px rgba(140,80,105,0.06);
+        }
+        *{box-sizing:border-box;margin:0;padding:0;}
+        body{font-family:'Noto Sans TC',"PingFang TC",sans-serif;background:var(--beige);color:var(--text-main);padding-bottom:80px;letter-spacing:.3px;}
+        header{background:var(--white);padding:18px 20px 14px;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:200;text-align:center;}
+        .header-inner{display:flex;align-items:center;justify-content:center;gap:10px;}
+        .header-dot{width:8px;height:8px;border-radius:50%;background:var(--rose);}
+        .header-title{font-size:1.7rem;font-weight:600;color:var(--text-main);letter-spacing:3px;}
+
+        .quote-bar{background:var(--rose-pale);padding:9px 20px;font-size:.76rem;color:var(--rose-deep);text-align:center;letter-spacing:.8px;font-style:italic;border-bottom:1px solid var(--rose-light);min-height:36px;display:flex;align-items:center;justify-content:center;}
+        .nav-tabs{display:flex;background:var(--white);border-bottom:1px solid var(--border);position:sticky;top:55px;z-index:199;overflow-x:auto;}
+        .nav-tabs::-webkit-scrollbar{display:none;}
+        .nav-tab{flex:0 0 auto;padding:11px 14px;font-size:.75rem;font-weight:500;color:var(--text-muted);cursor:pointer;letter-spacing:.5px;border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap;}
+        .nav-tab.active{color:var(--rose);border-bottom-color:var(--rose);}
+        .container{padding:14px;display:none;} .container.active{display:block;}
+        .card{background:var(--white);border-radius:16px;padding:16px;margin-bottom:12px;border:1px solid var(--border);box-shadow:var(--shadow-sm);}
+        .card-header{font-size:.78rem;font-weight:600;color:var(--text-sub);margin-bottom:12px;text-transform:uppercase;letter-spacing:1.2px;display:flex;align-items:center;gap:6px;}
+        .card-header::before{content:'';display:inline-block;width:3px;height:12px;background:var(--rose);border-radius:2px;}
+        .level-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;}
+        .level-btn{background:var(--beige);border:1px solid var(--border);border-radius:10px;padding:10px;text-align:center;font-size:.78rem;font-weight:500;color:var(--text-sub);cursor:pointer;transition:all .18s;}
+        .level-btn.active{background:var(--rose);color:var(--white);border-color:var(--rose);box-shadow:0 3px 12px rgba(200,116,138,.3);}
+        .buyer-btn-group{display:flex;flex-wrap:wrap;gap:7px;}
+        .buyer-btn{background:var(--beige);border:1px solid var(--border);border-radius:20px;padding:7px 13px;font-size:.74rem;font-weight:500;color:var(--text-sub);cursor:pointer;transition:all .18s;}
+        .buyer-btn.active{background:var(--rose-light);color:var(--rose-deep);border-color:var(--rose);}
+        .category-tabs{display:flex;gap:6px;margin-bottom:12px;overflow-x:auto;padding-bottom:4px;}
+        .category-tabs::-webkit-scrollbar{display:none;}
+        .cat-tab{font-size:.74rem;padding:6px 14px;border-radius:20px;background:var(--beige);border:1px solid var(--border);white-space:nowrap;cursor:pointer;color:var(--text-sub);font-weight:500;transition:all .18s;}
+        .cat-tab.active{background:var(--rose);color:var(--white);border-color:var(--rose);}
+        .product-item{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--beige-dark);}
+        .product-item:last-child{border-bottom:none;}
+        .product-name{font-size:.86rem;font-weight:500;color:var(--text-main);}
+        .qty-control{display:flex;align-items:center;gap:8px;}
+        .btn-qty{width:30px;height:30px;border-radius:50%;border:1px solid var(--border);background:var(--beige);color:var(--rose);font-weight:600;font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;}
+        .btn-qty:active{background:var(--rose);color:white;transform:scale(.92);}
+        .qty-input{width:26px;text-align:center;font-weight:600;font-size:.9rem;color:var(--text-main);border:none;background:transparent;outline:none;}
+        .result-card{background:var(--rose);color:white;padding:20px;border-radius:18px;text-align:center;margin-top:12px;position:relative;overflow:hidden;}
+        .result-card::before{content:'';position:absolute;top:-30px;right:-20px;width:100px;height:100px;border-radius:50%;background:rgba(255,255,255,.07);}
+        .result-label{font-size:.74rem;opacity:.85;letter-spacing:1px;text-transform:uppercase;}
+        .rev-hero{font-size:2.5rem;font-weight:600;margin:5px 0 7px;letter-spacing:-1px;}
+        .profit-pill{display:inline-block;background:rgba(255,255,255,.2);padding:5px 15px;border-radius:20px;font-size:.83rem;font-weight:500;}
+        .cost-note{font-size:.73rem;opacity:.7;margin-top:9px;}
+        .save-btn{width:100%;padding:16px;background:var(--text-main);color:white;border:none;border-radius:14px;font-weight:500;font-size:.93rem;margin-top:12px;letter-spacing:.8px;cursor:pointer;transition:all .2s;font-family:inherit;}
+        .save-btn:active{background:var(--rose-deep);transform:scale(.99);}
+        .stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
+        .stat-box{background:var(--white);padding:14px;border-radius:14px;text-align:center;border:1px solid var(--border);}
+        .stat-label{font-size:.68rem;color:var(--text-muted);margin-bottom:5px;display:block;letter-spacing:.8px;text-transform:uppercase;}
+        .stat-value{font-size:1.1rem;font-weight:600;color:var(--rose);}
+        .stat-hero{font-size:2rem;font-weight:600;color:var(--rose);}
+        .stat-hero-box{background:var(--white);border:1px solid var(--border);border-radius:14px;padding:18px;text-align:center;margin-bottom:10px;}
+        .progress-bar{height:6px;background:var(--beige-dark);border-radius:3px;overflow:hidden;margin-top:8px;}
+        .progress-fill{height:100%;background:var(--rose);border-radius:3px;transition:width .6s ease;}
+        .item-row{display:flex;justify-content:space-between;align-items:center;font-size:.82rem;padding:9px 0;border-bottom:1px solid var(--beige-dark);color:var(--text-main);}
+        .item-row:last-child{border-bottom:none;}
+        .item-row b{color:var(--rose);font-weight:600;}
+        .action-btn{background:transparent;color:var(--text-muted);border:1px solid var(--border);padding:4px 9px;border-radius:6px;font-size:.69rem;cursor:pointer;transition:all .15s;font-family:inherit;}
+        .action-btn.edit{color:var(--rose);border-color:var(--rose-light);}
+        .input-group{margin-bottom:13px;}
+        .input-label{font-size:.73rem;font-weight:600;color:var(--text-sub);margin-bottom:6px;display:block;text-transform:uppercase;letter-spacing:.8px;}
+        .custom-input{width:100%;padding:11px 13px;border:1px solid var(--border);border-radius:10px;font-size:.88rem;outline:none;background:var(--beige);color:var(--text-main);font-family:inherit;transition:border-color .2s;}
+        .custom-input:focus{border-color:var(--rose);background:var(--white);}
+        .cost-input{color:var(--rose-deep);border-left:3px solid var(--rose);}
+        .goal-card{background:var(--rose-pale);border:1px solid var(--rose-light);border-radius:16px;padding:16px;margin-bottom:12px;}
+        .series-container{margin-bottom:10px;}
+        .series-label{font-size:.77rem;display:flex;justify-content:space-between;margin-bottom:5px;color:var(--text-sub);font-weight:500;}
+        .series-bar{height:6px;background:var(--beige-dark);border-radius:3px;overflow:hidden;}
+        .series-fill{height:100%;border-radius:3px;transition:width .8s ease;}
+        .dual-bar{height:6px;background:var(--beige-dark);border-radius:3px;overflow:hidden;display:flex;}
+        .dual-bar-r{height:100%;background:#5BC8C0;} .dual-bar-t{height:100%;background:#3B6EDE;}
+        .dual-label{display:flex;justify-content:space-between;font-size:.77rem;margin-bottom:6px;color:var(--text-sub);}
+        .dual-label b{color:#5BC8C0;}
+        .last-month-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
+        .blue-box{background:#F0F6FF;border:1px solid #D5E5FF;border-radius:14px;padding:13px;text-align:center;}
+        .blue-box .stat-label{color:#7A9AC0;} .blue-box .stat-value{color:#3A78C9;}
+        .amber-box{background:#FEF8EE;border:1px solid #FAE5B8;border-radius:14px;padding:13px;text-align:center;grid-column:span 2;}
+        .amber-box .stat-label{color:#B08840;} .amber-box .stat-value{color:#D4960A;font-size:1.3rem;}
+        .section-label{font-size:.71rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:1.2px;margin:16px 0 8px;font-weight:600;padding-left:2px;}
+        /* Month select */
+        .month-select-wrap{position:relative;margin-bottom:14px;}
+        .month-select-wrap::after{content:'▾';position:absolute;right:14px;top:50%;transform:translateY(-50%);color:var(--rose);font-size:.9rem;pointer-events:none;}
+        .month-select{width:100%;padding:13px 36px 13px 14px;border:1.5px solid var(--rose-light);border-radius:12px;font-size:.92rem;font-weight:500;color:var(--text-main);background:var(--white);font-family:inherit;appearance:none;-webkit-appearance:none;outline:none;cursor:pointer;}
+        .month-select:focus{border-color:var(--rose);}
+        /* Order cards */
+        .order-card{background:var(--white);border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:10px;box-shadow:var(--shadow-sm);}
+        .order-card-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;}
+        .order-note{font-size:.9rem;font-weight:500;color:var(--text-main);}
+        .order-profit{font-size:.95rem;font-weight:600;color:var(--rose);}
+        .order-items{font-size:.75rem;color:var(--text-sub);margin-top:6px;}
+        .order-actions{display:flex;gap:6px;margin-top:10px;}
+        .date-badge{display:inline-block;background:var(--rose-pale);color:var(--rose-deep);font-size:.68rem;padding:2px 7px;border-radius:5px;font-weight:500;margin-left:5px;border:1px solid var(--rose-light);}
+        /* Chart */
+        .chart-wrap{overflow-x:auto;padding-bottom:8px;}
+        .chart-wrap::-webkit-scrollbar{height:4px;}
+        .chart-wrap::-webkit-scrollbar-thumb{background:var(--rose-light);border-radius:2px;}
+        .chart-legend{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:14px;}
+        .legend-item{display:flex;align-items:center;gap:6px;font-size:.75rem;color:var(--text-sub);}
+        .legend-dot{width:10px;height:10px;border-radius:2px;}
+        /* Settings */
+        .profile-banner{background:linear-gradient(135deg,var(--rose),var(--rose-deep));border-radius:18px;padding:22px 20px;color:white;margin-bottom:14px;text-align:center;}
+        .profile-name{font-size:1.5rem;font-weight:600;letter-spacing:1px;margin-bottom:4px;}
+        .profile-sub{font-size:.8rem;opacity:.85;letter-spacing:.5px;}
+
+        /* Toast */
+        .toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(20px);background:#2C2226;color:white;padding:12px 22px;border-radius:30px;font-size:.85rem;font-weight:500;letter-spacing:.3px;z-index:900;opacity:0;transition:all .3s ease;pointer-events:none;white-space:nowrap;}
+        .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+
+        /* ── 魔術曲線圖 ── */
+        .curve-sub-tabs{display:flex;gap:4px;background:var(--beige);border:1px solid var(--border);border-radius:12px;padding:4px;margin-bottom:14px;}
+        .curve-sub-tab{flex:1;padding:9px 10px;border:none;border-radius:8px;cursor:pointer;font-family:inherit;font-size:.74rem;font-weight:500;color:var(--text-muted);background:transparent;transition:all .2s;white-space:nowrap;}
+        .curve-sub-tab.active{background:var(--rose);color:var(--white);box-shadow:0 2px 8px rgba(200,116,138,.3);}
+        .curve-panel{display:none;} .curve-panel.active{display:block;}
+        .chart-wrap-curve{position:relative;height:320px;overflow:hidden;}
+        .curve-table-wrap{overflow-x:auto;margin-top:12px;}
+        .curve-table-wrap table{width:100%;border-collapse:collapse;font-size:.74rem;}
+        .curve-table-wrap th{background:var(--beige);color:var(--text-muted);padding:7px 8px;text-align:right;font-weight:500;border-bottom:2px solid var(--border);white-space:nowrap;}
+        .curve-table-wrap th:first-child{text-align:left;}
+        .curve-table-wrap td{padding:6px 8px;border-bottom:1px solid var(--beige-dark);text-align:right;font-size:.73rem;}
+        .curve-table-wrap td:first-child{text-align:left;font-weight:600;color:var(--rose-deep);}
+        .curve-table-wrap tr:last-child td{font-weight:700;color:var(--rose);border-top:1px solid var(--border);}
+        .delta-pos{color:#3A9E97;font-size:.7rem;} .delta-neg{color:#e05050;font-size:.7rem;}
+        .cell-input-curve{width:100%;min-width:60px;background:transparent;border:1px solid transparent;border-radius:4px;padding:3px 5px;color:var(--text-main);font-size:.73rem;text-align:right;outline:none;transition:all .15s;}
+        .cell-input-curve:hover{border-color:var(--border);background:var(--rose-pale);}
+        .cell-input-curve:focus{border-color:var(--rose);background:var(--white);}
+        .curve-legend{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:10px;}
+        .curve-legend-item{display:flex;align-items:center;gap:5px;font-size:.73rem;color:var(--text-sub);}
+        .curve-legend-box{width:10px;height:10px;border-radius:2px;flex-shrink:0;}
+        .curve-stat{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:12px;min-width:100px;text-align:center;}
+        .curve-stat .cs-label{font-size:.67rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px;}
+        .curve-stat .cs-val{font-size:1.05rem;font-weight:600;color:var(--rose);}
+        .curve-stat .cs-sub{font-size:.7rem;margin-top:2px;}
+        /* Top bar wrapper */
+        #topBar{position:fixed;top:0;left:0;right:0;z-index:200;}
+        /* Welcome screen */
+        .welcome-overlay{position:fixed;inset:0;background:linear-gradient(160deg,#FAF2F4 0%,#F2D9E0 50%,#FAF2F4 100%);z-index:1000;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 30px;transition:opacity .5s ease;}
+        .welcome-overlay.fade-out{opacity:0;pointer-events:none;}
+        .welcome-logo{font-size:2.8rem;font-weight:600;color:var(--text-main);letter-spacing:4px;margin-bottom:6px;}
+        .welcome-dots{display:flex;gap:8px;margin-bottom:28px;}
+        .welcome-dot{width:8px;height:8px;border-radius:50%;background:var(--rose);}
+        .welcome-greeting{font-size:1.2rem;font-weight:500;color:var(--rose-deep);margin-bottom:8px;text-align:center;}
+        .welcome-sub{font-size:.85rem;color:var(--text-sub);text-align:center;line-height:1.7;margin-bottom:40px;}
+        .welcome-btn{padding:16px 48px;background:var(--rose);color:white;border:none;border-radius:50px;font-size:1rem;font-weight:500;letter-spacing:1px;cursor:pointer;font-family:inherit;box-shadow:0 6px 24px rgba(200,116,138,.35);transition:transform .15s;}
+        .welcome-btn:active{transform:scale(.97);}
+        /* Header profile pill */
+        .header-profile-pill{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:var(--rose-pale);border:1px solid var(--rose-light);border-radius:20px;padding:5px 10px;display:none;align-items:center;gap:5px;max-width:110px;}
+        .header-profile-pill .pill-dot{width:6px;height:6px;border-radius:50%;background:var(--rose);flex-shrink:0;}
+        .header-profile-pill .pill-text{font-size:.68rem;font-weight:500;color:var(--rose-deep);line-height:1.3;overflow:hidden;}
+        /* touch-action */
+        html,body{touch-action:manipulation;}
+        /* Modal */
+        .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:500;display:none;align-items:flex-end;}
+        .modal-overlay.open{display:flex;}
+        .modal-sheet{background:var(--white);border-radius:22px 22px 0 0;width:100%;max-height:92vh;overflow-y:auto;padding:20px 16px 40px;animation:slideUp .28s ease;}
+        @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+        .modal-handle{width:40px;height:4px;background:var(--beige-dark);border-radius:2px;margin:0 auto 18px;}
+        .modal-title{font-size:1rem;font-weight:600;margin-bottom:16px;color:var(--text-main);}
+        .modal-actions{display:flex;gap:10px;margin-top:16px;}
+        .btn-primary{flex:1;padding:14px;background:var(--rose);color:white;border:none;border-radius:12px;font-weight:500;font-size:.9rem;cursor:pointer;font-family:inherit;}
+        .btn-secondary{flex:0 0 auto;padding:14px 18px;background:var(--beige);color:var(--text-sub);border:1px solid var(--border);border-radius:12px;font-size:.9rem;cursor:pointer;font-family:inherit;}
+        .btn-danger{flex:0 0 auto;padding:14px 16px;background:transparent;color:#c55;border:1px solid #fcc;border-radius:12px;font-size:.9rem;cursor:pointer;font-family:inherit;}
+    </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-datalabels/2.2.0/chartjs-plugin-datalabels.min.js"></script>
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&family=DM+Mono:wght@400;500&display=swap');
-
-  :root {
-    --bg: #faf6f2;
-    --surface: #ffffff;
-    --surface2: #f2ece4;
-    --border: #ddd0c0;
-    --text: #3a2010;
-    --text-muted: #9a7a60;
-    --accent1: #8B5E3C;
-    --accent2: #7a9a50;
-    --accent3: #c0603a;
-    --teal: #8B5E3C;
-    --blue: #6B4A2C;
-    --purple: #a07050;
-    --gold: #b08030;
-    --chart1a: #c4956a;
-    --chart1b: #8B5E3C;
-    --chart1c: #a07858;
-    --chart2a: #c4956a;
-    --chart2b: #7B4A2D;
-    --chart3a: #d4aa80;
-    --chart3b: #6B3A1D;
-  }
-
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-
-  body {
-    font-family: 'Noto Sans TC', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
-
-
-  /* ── Cute decorations ── */
-  @keyframes float {
-    0%,100% { transform: translateY(0px) rotate(0deg); }
-    33% { transform: translateY(-6px) rotate(3deg); }
-    66% { transform: translateY(-3px) rotate(-2deg); }
-  }
-  @keyframes sparkle {
-    0%,100% { opacity:.4; transform: scale(1); }
-    50% { opacity:1; transform: scale(1.3); }
-  }
-  @keyframes wiggle {
-    0%,100% { transform: rotate(-3deg); }
-    50% { transform: rotate(3deg); }
-  }
-
-  .deco-strip {
-    display: flex;
-    justify-content: center;
-    gap: 16px;
-    font-size: 20px;
-    padding: 10px 0 2px;
-    letter-spacing: 4px;
-  }
-  .deco-strip span:nth-child(odd)  { animation: float 3s ease-in-out infinite; }
-  .deco-strip span:nth-child(even) { animation: float 3s ease-in-out infinite .8s; }
-
-  .why-icon { animation: float 3s ease-in-out infinite; }
-  .why-card:nth-child(2) .why-icon { animation-delay: .5s; }
-  .why-card:nth-child(3) .why-icon { animation-delay: 1s; }
-
-  .section-title { position: relative; }
-
-  /* cute dot on stat pill */
-  .stat-pill { position: relative; overflow: hidden; }
-  .stat-pill::before {
-    content: '';
-    position: absolute;
-    top: -10px; right: -10px;
-    width: 40px; height: 40px;
-    background: radial-gradient(circle, rgba(139,94,60,.12) 0%, transparent 70%);
-    border-radius: 50%;
-  }
-
-  /* Rounded cute buttons */
-  .btn-primary { border-radius: 20px !important; }
-  .btn-danger  { border-radius: 20px !important; }
-  .btn         { border-radius: 20px !important; }
-
-  /* Cute chart card top border */
-  .chart-card {
-    border-top: 3px solid #c4956a !important;
-    border-radius: 16px !important;
-  }
-
-  /* Cute input focus */
-  .cell-input:focus {
-    border-color: #c4956a !important;
-    box-shadow: 0 0 0 3px rgba(196,149,106,.2) !important;
-  }
-
-  /* Cute tab active */
-  .tab-btn.active {
-    background: linear-gradient(135deg, #f5e8d8, #ffe8cc) !important;
-    color: #8B5E3C !important;
-    box-shadow: 0 2px 8px rgba(139,94,60,.2) !important;
-  }
-
-  /* ── Header ── */
-  header {
-    background: linear-gradient(135deg, #f0e8de 0%, #faf6f2 60%);
-    border-bottom: 2px solid var(--border);
-    padding: 18px 24px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    backdrop-filter: blur(12px);
-  }
-  header h1 {
-    font-size: 20px;
-    font-weight: 700;
-    background: linear-gradient(90deg, #8B5E3C, #c4956a);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    letter-spacing: 2px;
-  }
-  .header-sub { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
-
-  /* ── Layout ── */
-  .container { max-width: 1400px; margin: 0 auto; padding: 24px 16px; }
-
-  /* ── Tabs ── */
-  .tabs {
-    display: flex;
-    gap: 4px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 4px;
-    margin-bottom: 24px;
-    overflow-x: auto;
-  }
-  .tab-btn {
-    flex: 1;
-    min-width: 100px;
-    padding: 10px 12px;
-    border: none;
-    border-radius: 7px;
-    cursor: pointer;
-    font-family: inherit;
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--text-muted);
-    background: transparent;
-    transition: all .2s;
-    white-space: nowrap;
-  }
-  .tab-btn.active {
-    background: var(--surface2);
-    color: var(--text);
-    box-shadow: 0 1px 8px rgba(0,0,0,.4);
-  }
-  .tab-btn:hover:not(.active) { color: var(--text); background: rgba(255,255,255,.04); }
-
-  /* ── Panels ── */
-  .panel { display: none; }
-  .panel.active { display: block; }
-
-  /* ── Chart Card ── */
-  .chart-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 20px;
-    margin-bottom: 20px;
-  }
-  .chart-title {
-    font-size: 15px;
-    font-weight: 700;
-    color: var(--text);
-    margin-bottom: 4px;
-  }
-  .chart-subtitle { font-size: 12px; color: var(--text-muted); margin-bottom: 16px; }
-  .chart-wrap { position: relative; height: 420px; }
-
-  /* ── Inline table (inside chart card) ── */
-  .inline-table-title {
-    font-size: 12px;
-    font-weight: 700;
-    color: var(--text-muted);
-    letter-spacing: 1px;
-    margin: 18px 0 8px;
-    padding-top: 16px;
-    border-top: 1px solid var(--border);
-  }
-
-  /* ── Data Input Section ── */
-  .input-section {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 20px;
-    margin-bottom: 20px;
-  }
-  .section-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 16px;
-  }
-  .section-title {
-    font-size: 14px;
-    font-weight: 700;
-    color: var(--teal);
-    letter-spacing: 1px;
-  }
-
-  /* ── Form Grid ── */
-  .form-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-    gap: 10px;
-    margin-bottom: 16px;
-  }
-  .form-group label {
-    display: block;
-    font-size: 11px;
-    color: var(--text-muted);
-    margin-bottom: 5px;
-    font-weight: 500;
-    letter-spacing: .5px;
-  }
-  .form-group input, .form-group select {
-    width: 100%;
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: 7px;
-    padding: 8px 10px;
-    color: var(--text);
-    font-family: 'DM Mono', monospace;
-    font-size: 13px;
-    outline: none;
-    transition: border-color .2s;
-  }
-  .form-group input:focus, .form-group select:focus {
-    border-color: var(--accent1);
-    box-shadow: 0 0 0 2px rgba(88,166,255,.15);
-  }
-  .form-group select option { background: var(--surface); }
-
-  /* ── Buttons ── */
-  .btn {
-    padding: 9px 18px;
-    border: none;
-    border-radius: 7px;
-    font-family: inherit;
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all .15s;
-  }
-  .btn-primary { background: var(--accent1); color: #ffffff; }
-  .btn-primary:hover { background: #a07050; transform: translateY(-1px); }
-  .btn-danger { background: rgba(247,129,102,.15); color: var(--accent3); border: 1px solid rgba(247,129,102,.3); }
-  .btn-danger:hover { background: rgba(247,129,102,.25); }
-  .btn-sm { padding: 5px 10px; font-size: 12px; }
-  .btn-success { background: rgba(63,185,80,.15); color: var(--accent2); border: 1px solid rgba(63,185,80,.3); }
-  .btn-success:hover { background: rgba(63,185,80,.25); }
-  .btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
-
-  /* ── Data Table ── */
-  .table-wrap { overflow-x: auto; }
-  table { width: 100%; border-collapse: collapse; font-size: 12px; }
-  th {
-    background: var(--bg);
-    color: var(--text-muted);
-    padding: 8px 10px;
-    text-align: right;
-    font-weight: 500;
-    border-bottom: 2px solid var(--border);
-    white-space: nowrap;
-  }
-  th:first-child { text-align: left; }
-  td {
-    padding: 7px 10px;
-    border-bottom: 1px solid rgba(48,54,61,.5);
-    text-align: right;
-    font-family: 'DM Mono', monospace;
-    font-size: 12px;
-  }
-  td:first-child { text-align: left; font-family: inherit; font-weight: 500; }
-  tr:hover td { background: rgba(255,255,255,.025); }
-  .delta-pos { color: var(--accent2); font-size: 11px; }
-  .delta-neg { color: var(--accent3); font-size: 11px; }
-  .total-row td { font-weight: 700; color: var(--teal); border-top: 1px solid var(--border); }
-
-  /* ── Why Section ── */
-  .why-section {
-    background: linear-gradient(135deg, #f5ede2 0%, #fff8f2 100%);
-    border: 1px solid rgba(139,94,60,.25);
-    border-radius: 12px;
-    padding: 20px;
-    margin-bottom: 20px;
-  }
-  .why-title {
-    font-size: 15px;
-    font-weight: 700;
-    color: var(--teal);
-    margin-bottom: 14px;
-    letter-spacing: 1px;
-  }
-  .why-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
-    margin-bottom: 14px;
-  }
-  .why-card {
-    background: rgba(255,255,255,.04);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 12px 10px;
-    text-align: center;
-  }
-  .why-icon { font-size: 22px; margin-bottom: 6px; }
-  .why-label { font-size: 12px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
-  .why-desc { font-size: 11px; color: var(--text-muted); line-height: 1.4; }
-  .why-banner {
-    background: linear-gradient(90deg, rgba(139,94,60,.1), rgba(107,74,44,.08));
-    border: 1px solid rgba(139,94,60,.25);
-    border-radius: 8px;
-    padding: 10px 14px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    flex-wrap: wrap;
-    margin-bottom: 10px;
-    font-size: 13px;
-    font-weight: 700;
-    color: var(--text);
-  }
-  .why-sub {
-    font-size: 11px;
-    color: var(--text-muted);
-    text-align: center;
-    line-height: 1.8;
-  }
-  @media (max-width: 500px) {
-    .why-grid { grid-template-columns: 1fr; }
-  }
-
-  /* ── Inline editable cell ── */
-  .cell-input {
-    width: 100%;
-    min-width: 70px;
-    background: transparent;
-    border: 1px solid transparent;
-    border-radius: 5px;
-    padding: 4px 6px;
-    color: var(--text);
-    font-family: 'DM Mono', monospace;
-    font-size: 12px;
-    text-align: right;
-    outline: none;
-    transition: border-color .15s, background .15s;
-  }
-  .cell-input:hover { border-color: var(--border); background: var(--surface2); }
-  .cell-input:focus { border-color: var(--accent1); background: var(--surface2); box-shadow: 0 0 0 2px rgba(88,166,255,.15); }
-
-  /* ── Color dots ── */
-  .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 5px; }
-
-  /* ── Empty state ── */
-  .empty {
-    text-align: center;
-    padding: 40px 20px;
-    color: var(--text-muted);
-    font-size: 14px;
-  }
-  .empty-icon { font-size: 32px; margin-bottom: 8px; }
-
-  /* ── Toast ── */
-  .toast {
-    position: fixed;
-    bottom: 24px;
-    right: 24px;
-    background: #7a9a50;
-    color: #ffffff;
-    padding: 10px 18px;
-    border-radius: 8px;
-    font-size: 13px;
-    font-weight: 600;
-    z-index: 999;
-    opacity: 0;
-    transform: translateY(10px);
-    transition: all .3s;
-    pointer-events: none;
-  }
-  .toast.show { opacity: 1; transform: translateY(0); }
-
-  /* ── Legend ── */
-  .legend { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 12px; }
-  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-muted); }
-  .legend-box { width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0; }
-
-  /* ── Stat pills ── */
-  .stats-row { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 16px; }
-  .stat-pill {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 10px 14px;
-    min-width: 110px;
-  }
-  .stat-pill .label { font-size: 11px; color: var(--text-muted); margin-bottom: 3px; }
-  .stat-pill .value { font-family: 'DM Mono', monospace; font-size: 16px; font-weight: 700; color: var(--text); }
-  .stat-pill .sub { font-size: 11px; color: var(--accent2); margin-top: 1px; }
-
-  .month-chips { display: flex; flex-wrap: wrap; gap: 7px; }
-  .month-chip {
-    padding: 6px 12px;
-    border-radius: 20px;
-    border: 1px solid var(--border);
-    background: var(--bg);
-    color: var(--text-muted);
-    font-size: 12px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all .15s;
-    font-family: 'DM Mono', monospace;
-  }
-  .month-chip:hover { border-color: var(--accent1); color: var(--accent1); }
-  .month-chip.active { background: var(--accent1); color: #ffffff; border-color: var(--accent1); }
-
-  /* ── Month selector for edit ── */
-  .month-select-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 12px; }
-
-  .divider { height: 1px; background: var(--border); margin: 16px 0; }
-
-  @media (max-width: 600px) {
-    .form-grid { grid-template-columns: 1fr 1fr; }
-    .chart-wrap { height: 320px; }
-  }
-</style>
 </head>
 <body>
-
-<div style="text-align:center;padding:32px 0 16px">
-  
-</div>
-<header>
-  <div>
-    <h1>DCT魔術曲線圖生成 <span style="font-size:18px">✨</span></h1>
-    <div class="header-sub">🌸 自動生成圖表 · 月增統計 · 資料永久保存 🌸</div>
-  </div>
-</header>
-
-
-<div class="deco-strip"><span>🌸</span><span>⭐</span><span>🍀</span><span>✨</span><span>🌙</span><span>💫</span><span>🌸</span></div>
-<div class="container">
-
-  <!-- TABS -->
-  <div class="tabs">
-    <button class="tab-btn active" onclick="switchTab('input')">➕ 資料輸入</button>
-    <button class="tab-btn" onclick="switchTab('chart1')">💰 淨利</button>
-    <button class="tab-btn" onclick="switchTab('chart2')">👥 粉絲</button>
-  </div>
-
-  <!-- ════════ INPUT PANEL ════════ -->
-  <div class="panel active" id="panel-input">
-
-    <!-- WHY SECTION -->
-    <div class="why-section">
-      <div class="why-title">✨ 為什麼每個月都要更新魔術曲線圖？</div>
-      <div class="why-grid">
-        <div class="why-card">
-          <div class="why-icon">📊</div>
-          <div class="why-label">衡量帳號活躍度</div>
-          <div class="why-desc">評估每個月新增影片的文數／內容效度</div>
-        </div>
-        <div class="why-card">
-          <div class="why-icon">💡</div>
-          <div class="why-label">認清步伐，正視問題</div>
-          <div class="why-desc">檢查影片是否有效？找上家討論、優化調整</div>
-        </div>
-        <div class="why-card">
-          <div class="why-icon">🎯</div>
-          <div class="why-label">找出個人定位</div>
-          <div class="why-desc">確認自己走的方向是否正確</div>
-        </div>
-      </div>
-      <div class="why-banner" style="border-radius:20px">
-        <span>🚀</span>
-        <span>粉絲成長，收入才會穩定不停滯！</span>
-        <span>魔術曲線圖是淨利的前驅物</span>
-      </div>
-      <div class="why-sub">每個月覆盤更新給上家 · 整個月的狀態一目瞭然 · 鎖定目標，固定輸出 💪</div>
-    </div>
-
-    <!-- Profile / Chart Title Settings -->
-    <div class="input-section">
-      <div class="section-title" style="margin-bottom:12px">🪪 圖表標題設定</div>
-      <div class="form-grid">
-        <div class="form-group">
-          <label>👤 姓名</label>
-          <input type="text" id="cfg-name" placeholder="例：婕Kevin" oninput="saveConfig()">
-        </div>
-        <div class="form-group">
-          <label>🏅 級別</label>
-          <input type="text" id="cfg-level" placeholder="例：三級" oninput="saveConfig()">
-        </div>
-        <div class="form-group">
-          <label>🔗 上家</label>
-          <input type="text" id="cfg-upline" placeholder="例：呂財神" oninput="saveConfig()">
-        </div>
-        <div class="form-group">
-          <label>📅 年份範圍</label>
-          <input type="text" id="cfg-years" placeholder="例：2023-2025" oninput="saveConfig()">
-        </div>
-      </div>
-    </div>
-
-    <div class="input-section">
-      <div class="section-header">
-        <div class="section-title">➕ 新增月份</div>
-      </div>
-      <div class="month-select-row">
-        <div class="form-group" style="min-width:90px">
-          <label>年份</label>
-          <select id="inp-year"></select>
-        </div>
-        <div class="form-group" style="min-width:75px">
-          <label>月份</label>
-          <select id="inp-month">
-            <option value="1">1月</option><option value="2">2月</option>
-            <option value="3">3月</option><option value="4">4月</option>
-            <option value="5">5月</option><option value="6">6月</option>
-            <option value="7">7月</option><option value="8">8月</option>
-            <option value="9">9月</option><option value="10">10月</option>
-            <option value="11">11月</option><option value="12">12月</option>
-          </select>
-        </div>
-      </div>
-
-      <div style="margin-bottom:8px;font-size:12px;color:var(--text-muted)">💰 淨利</div>
-      <div class="form-grid">
-        <div class="form-group">
-          <label><span class="dot" style="background:#7ecfda"></span>零售</label>
-          <input type="number" id="inp-retail" placeholder="0" min="0">
-        </div>
-        <div class="form-group">
-          <label><span class="dot" style="background:#1f6feb"></span>團隊</label>
-          <input type="number" id="inp-team" placeholder="0" min="0">
-        </div>
-        <div class="form-group">
-          <label><span class="dot" style="background:#8b5cf6"></span>返利</label>
-          <input type="number" id="inp-rebate" placeholder="0" min="0">
-        </div>
-      </div>
-
-      <div style="margin-bottom:8px;font-size:12px;color:var(--text-muted)">👥 粉絲</div>
-      <div class="form-grid">
-        <div class="form-group">
-          <label><span class="dot" style="background:#5bc4d0"></span>TikTok</label>
-          <input type="number" id="inp-tiktok" placeholder="0" min="0">
-        </div>
-        <div class="form-group">
-          <label><span class="dot" style="background:#1e5fcc"></span>IG</label>
-          <input type="number" id="inp-ig" placeholder="0" min="0">
-        </div>
-      </div>
-
-      <button class="btn btn-primary" style="width:100%;margin-top:4px" onclick="addNewMonth()">＋ 新增這個月</button>
-    </div>
-
-    <!-- Editable Table -->
-    <div class="input-section">
-      <div class="section-header">
-        <div class="section-title">📊 月份資料（直接修改即可自動儲存）</div>
-      </div>
-      <div class="table-wrap" id="summary-table-wrap">
-        <div class="empty"><div class="empty-icon">📭</div>尚未新增任何資料</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ════════ CHART 1: 淨利 ════════ -->
-  <div class="panel" id="panel-chart1">
-    <div id="stats1" class="stats-row"></div>
-    <div class="chart-card">
-      <div class="chart-title" id="chart1-title">惠誼淨利</div>
-      <div class="chart-subtitle" id="chart1-sub">三口袋月度淨利堆疊長條圖</div>
-      <div class="legend">
-        <div class="legend-item"><div class="legend-box" style="background:var(--chart1a)"></div>第一口袋 零售</div>
-        <div class="legend-item"><div class="legend-box" style="background:var(--chart1b)"></div>第二口袋 團隊</div>
-        <div class="legend-item"><div class="legend-box" style="background:var(--chart1c)"></div>第三口袋 返利</div>
-      </div>
-      <div class="chart-wrap"><canvas id="chart1"></canvas></div>
-      <div class="inline-table-title">📋 月份明細</div>
-      <div class="table-wrap" id="table1-wrap"></div>
-    </div>
-  </div>
-
-  <!-- ════════ CHART 2: 粉絲 ════════ -->
-  <div class="panel" id="panel-chart2">
-    <div id="stats2" class="stats-row"></div>
-    <div class="chart-card">
-      <div class="chart-title" id="chart2-title">惠誼粉絲</div>
-      <div class="chart-subtitle" id="chart2-sub">TikTok + IG 月度粉絲堆疊長條圖</div>
-      <div class="legend">
-        <div class="legend-item"><div class="legend-box" style="background:var(--chart2a)"></div>TikTok</div>
-        <div class="legend-item"><div class="legend-box" style="background:var(--chart2b)"></div>IG</div>
-      </div>
-      <div class="chart-wrap"><canvas id="chart2"></canvas></div>
-      <div class="inline-table-title">📋 月份明細</div>
-      <div class="table-wrap" id="table2-wrap"></div>
-    </div>
-  </div>
-
-</div>
-
 <div class="toast" id="toast"></div>
+<!-- Welcome -->
+<div class="welcome-overlay" id="welcomeOverlay">
+    <div class="welcome-logo">DCT Money</div>
+    <div class="welcome-dots"><div class="welcome-dot"></div><div class="welcome-dot" style="opacity:.5"></div><div class="welcome-dot" style="opacity:.25"></div></div>
+    <div class="welcome-greeting" id="welcomeGreeting">歡迎回來</div>
+    <div class="welcome-sub" id="welcomeSub">記錄每一筆成交<br>讓數字見證妳的努力</div>
+    <button class="welcome-btn" onclick="dismissWelcome()">開始使用</button>
+</div>
+<div id="topBar">
+<header>
+    <div class="header-inner"><div class="header-dot"></div><span class="header-title">DCT Money</span><div class="header-dot"></div></div>
+    <div class="header-profile-pill" id="headerProfile">
+        <div class="pill-dot"></div>
+        <div class="pill-text" id="headerProfileText"></div>
+    </div>
+</header>
+<div class="quote-bar" id="dailyQuote">載入中…</div>
+<div class="nav-tabs">
+    <div class="nav-tab active" onclick="switchTab('tab-new',this)">開單</div>
+    <div class="nav-tab" onclick="switchTab('tab-daily',this)">今日</div>
+    <div class="nav-tab" onclick="switchTab('tab-chart',this)">圖表</div>
+    <div class="nav-tab" onclick="switchTab('tab-monthly',this)">月報</div>
+    <div class="nav-tab" onclick="switchTab('tab-history',this)">歷史</div>
+    <div class="nav-tab" onclick="switchTab('tab-settings',this)">設定</div>
+    <div class="nav-tab" onclick="switchTab('tab-curve',this)">曲線圖</div>
+</div>
+</div><!-- /topBar -->
+
+<!-- 開單 -->
+<div id="tab-new" class="container active">
+    <div class="card"><div class="card-header">我的等級</div>
+        <div style="position:relative;">
+            <select id="sellerSelect" class="month-select" onchange="currentSeller=this.value;initOrderUI();" style="border-color:var(--rose-light);">
+                <option value="L2">二級輔導</option>
+                <option value="L3_sup">三級輔導</option>
+                <option value="L3_ret">三級零售</option>
+                <option value="intern">實習零售</option>
+            </select>
+            <span style="position:absolute;right:14px;top:50%;transform:translateY(-50%);color:var(--rose);pointer-events:none;">▾</span>
+        </div>
+    </div>
+    <div class="card"><div class="card-header">銷售對象</div><div class="buyer-btn-group" id="buyerSelector"></div></div>
+    <div class="card">
+        <div class="card-header">選擇產品</div>
+        <div class="category-tabs">
+            <div class="cat-tab active" onclick="switchCat('活動',this)">活動</div>
+            <div class="cat-tab" onclick="switchCat('纖體',this)">纖體</div>
+            <div class="cat-tab" onclick="switchCat('美肌',this)">美肌</div>
+            <div class="cat-tab" onclick="switchCat('保健',this)">保健</div>
+        </div>
+        <div id="productList"></div>
+    </div>
+    <div class="card">
+        <div class="card-header">日期、費用與備註</div>
+        <div class="input-group">
+            <span class="input-label">訂單日期（可補登過去日期）</span>
+            <input type="datetime-local" id="orderDate" class="custom-input" style="color:var(--rose-deep);">
+        </div>
+        <div class="input-group">
+            <span class="input-label">額外成本（運費 / 手續費）</span>
+            <input type="number" id="extraCost" class="custom-input cost-input" placeholder="請輸入金額" oninput="updateCalc()">
+        </div>
+        <div class="input-group" style="margin-bottom:0">
+            <span class="input-label">客戶備註</span>
+            <input type="text" id="orderNote" class="custom-input" placeholder="客戶 IG 帳號或姓名">
+        </div>
+    </div>
+    <div class="result-card">
+        <div class="result-label">本次銷售金額</div>
+        <div id="revDisplay" class="rev-hero">$0</div>
+        <div id="profitDisplay" class="profit-pill">預估淨利 $0</div>
+        <div id="costDisplay" class="cost-note">總成本（含額外）$0</div>
+    </div>
+    <button class="save-btn" onclick="saveOrder()">儲存這筆訂單</button>
+</div>
+
+<!-- 今日 -->
+<div id="tab-daily" class="container">
+    <div class="stat-hero-box"><span class="stat-label">今日總淨利</span><div id="dTotalProfit" class="stat-hero">$0</div></div>
+    <div class="stat-grid">
+        <div class="stat-box"><span class="stat-label">今日營業額</span><div id="dTotalRev" class="stat-value">$0</div></div>
+        <div class="stat-box"><span class="stat-label">今日總成本</span><div id="dTotalCost" class="stat-value" style="color:var(--text-sub)">$0</div></div>
+    </div>
+    <div class="card"><div class="card-header">今日銷售商品</div><div id="dItemStats"></div></div>
+    <div class="card"><div class="card-header">今日訂單</div><div id="dOrderList"></div></div>
+</div>
+
+<!-- 歷史 -->
+<div id="tab-history" class="container">
+    <div class="card">
+        <div class="card-header">搜尋備註</div>
+        <div style="position:relative;">
+            <input type="text" id="historySearch" class="custom-input" placeholder="輸入客戶名稱 / IG 帳號…" oninput="onSearchInput()" style="padding-left:38px;">
+            <span style="position:absolute;left:13px;top:50%;transform:translateY(-50%);font-size:1rem;color:var(--text-muted);">🔍</span>
+        </div>
+        <div id="searchResults" style="display:none;margin-top:10px;"></div>
+    </div>
+    <div class="card" id="monthPickerCard">
+        <div class="card-header">選擇月份</div>
+        <div class="month-select-wrap">
+            <select class="month-select" id="monthSelect" onchange="onMonthChange()">
+                <option value="">— 請選擇月份 —</option>
+            </select>
+        </div>
+    </div>
+    <div id="historyContent"></div>
+</div>
+
+<!-- 圖表 -->
+<div id="tab-chart" class="container">
+    <div class="card">
+        <div class="card-header">業績兩口袋（營業額）條狀圖</div>
+        <div id="chartProfileBadge" style="margin-bottom:10px;padding:8px 12px;background:var(--rose-pale);border-radius:10px;border:1px solid var(--rose-light);display:none;align-items:center;gap:8px;">
+            <div style="width:7px;height:7px;border-radius:50%;background:var(--rose);flex-shrink:0;"></div>
+            <span id="chartProfileText" style="font-size:.8rem;color:var(--rose-deep);font-weight:500;"></span>
+        </div>
+        <div class="chart-legend">
+            <div class="legend-item"><div class="legend-dot" style="background:var(--c1)"></div>第一口袋 零售</div>
+            <div class="legend-item"><div class="legend-dot" style="background:var(--c2)"></div>第二口袋 團隊</div>
+        </div>
+        <div class="chart-wrap" id="chartWrap"></div>
+    </div>
+    <div class="card"><div class="card-header">各月詳細數字</div><div id="chartTable"></div></div>
+    <div class="card">
+        <div class="card-header">手動輸入歷史業績</div>
+        <div style="font-size:.75rem;color:var(--text-muted);margin-bottom:12px;line-height:1.6;">補登過去未記錄的月份業績，輸入後圖表與歷史同步更新。</div>
+        <div class="input-group">
+            <span class="input-label">年份 / 月份</span>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+                <div style="position:relative;">
+                    <select id="manualYear" class="month-select" style="font-size:.85rem;padding:10px 30px 10px 12px;">
+                    </select>
+                    <span style="position:absolute;right:10px;top:50%;transform:translateY(-50%);color:var(--rose);pointer-events:none;font-size:.8rem;">▾</span>
+                </div>
+                <div style="position:relative;">
+                    <select id="manualMonth" class="month-select" style="font-size:.85rem;padding:10px 30px 10px 12px;">
+                        <option value="0">1月</option><option value="1">2月</option><option value="2">3月</option>
+                        <option value="3">4月</option><option value="4">5月</option><option value="5">6月</option>
+                        <option value="6">7月</option><option value="7">8月</option><option value="8">9月</option>
+                        <option value="9">10月</option><option value="10">11月</option><option value="11">12月</option>
+                    </select>
+                    <span style="position:absolute;right:10px;top:50%;transform:translateY(-50%);color:var(--rose);pointer-events:none;font-size:.8rem;">▾</span>
+                </div>
+            </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">
+            <div class="input-group" style="margin-bottom:0;">
+                <span class="input-label" style="color:#3A9E97;">第一口袋 零售淨利</span>
+                <input type="number" id="manualRetail" class="custom-input" placeholder="0" style="border-left:3px solid #5BC8C0;">
+            </div>
+            <div class="input-group" style="margin-bottom:0;">
+                <span class="input-label" style="color:#2856C8;">第二口袋 團隊淨利</span>
+                <input type="number" id="manualTeam" class="custom-input" placeholder="0" style="border-left:3px solid #3B6EDE;">
+            </div>
+        </div>
+        <button class="save-btn" style="margin-top:0;" onclick="saveManualEntry()">儲存這個月份</button>
+    </div>
+</div>
+
+<!-- 月報 -->
+<div id="tab-monthly" class="container">
+    <div class="goal-card">
+        <div class="card-header">本月目標達成率</div>
+        <input type="number" id="mGoalInput" class="custom-input" style="text-align:center;background:white;" placeholder="設定目標淨利" onchange="updateGoal(this.value)">
+        <div style="display:flex;justify-content:space-between;font-size:.74rem;color:var(--rose-deep);margin-top:10px;margin-bottom:4px;"><span>達成進度</span><span id="mGoalPercent" style="font-weight:600;">0%</span></div>
+        <div class="progress-bar"><div id="mGoalBar" class="progress-fill" style="width:0%"></div></div>
+    </div>
+    <div class="stat-grid" style="grid-template-columns:1fr 1fr 1fr;">
+        <div class="stat-box"><span class="stat-label">本月營業額</span><div id="mTotalRev" class="stat-value">$0</div></div>
+        <div class="stat-box"><span class="stat-label">本月總成本</span><div id="mTotalCost" class="stat-value" style="color:var(--text-sub)">$0</div></div>
+        <div class="stat-box"><span class="stat-label">本月淨利</span><div id="mTotalProfit" class="stat-value">$0</div></div>
+    </div>
+    <div class="section-label">上月對照</div>
+    <div class="last-month-grid">
+        <div class="blue-box"><span class="stat-label">上月營業額</span><div id="lastMRev" class="stat-value">$0</div></div>
+        <div class="blue-box"><span class="stat-label">上月總成本</span><div id="lastMCost" class="stat-value">$0</div></div>
+        <div class="amber-box"><span class="stat-label">上月淨利</span><div id="lastMProfit" class="stat-value">$0</div></div>
+    </div>
+    <div class="card"><div class="card-header">系列業績佔比</div><div id="seriesChart"></div></div>
+    <div class="card">
+        <div class="card-header">零售 vs 團隊</div>
+        <div class="dual-label"><span style="color:#3A9E97">零售 <b id="mRetailP" style="color:#3A9E97">0%</b></span><span style="color:#2856C8">團隊 <b id="mTeamP" style="color:#2856C8">0%</b></span></div>
+        <div class="dual-bar"><div id="mRetailBar" class="dual-bar-r" style="width:0%"></div><div id="mTeamBar" class="dual-bar-t" style="width:0%"></div></div>
+    </div>
+    <div class="card"><div class="card-header">本月熱銷排行</div><div id="mItemStats"></div></div>
+</div>
+
+<!-- 設定 -->
+<div id="tab-settings" class="container">
+    <div class="profile-banner"><div class="profile-name" id="profileNameDisplay">—</div><div class="profile-sub" id="profileSubDisplay">尚未設定</div></div>
+    <div class="card">
+        <div class="card-header">個人資料</div>
+        <div class="input-group"><span class="input-label">姓名 / 暱稱</span><input type="text" id="settingName" class="custom-input" placeholder="輸入你的名字" oninput="saveProfile()"></div>
+        <div class="input-group"><span class="input-label">等級</span>
+            <select id="settingLevel" class="custom-input" onchange="saveProfile()">
+                <option value="">請選擇</option>
+                <option value="實習">實習</option>
+                <option value="三級零售">三級零售</option>
+                <option value="三級輔導">三級輔導</option>
+                <option value="二級輔導">二級輔導</option>
+            </select>
+        </div>
+        <div class="input-group" style="margin-bottom:0"><span class="input-label">上家 / 推薦人</span><input type="text" id="settingUpline" class="custom-input" placeholder="輸入上家姓名" oninput="saveProfile()"></div>
+    </div>
+</div>
+
+<!-- 曲線圖 -->
+<div id="tab-curve" class="container">
+    <!-- Sub tabs -->
+    <div class="curve-sub-tabs">
+        <button class="curve-sub-tab active" onclick="switchCurve('curve-input',this)">➕ 資料輸入</button>
+        <button class="curve-sub-tab" onclick="switchCurve('curve-profit',this)">💰 淨利圖</button>
+        <button class="curve-sub-tab" onclick="switchCurve('curve-fans',this)">👥 粉絲圖</button>
+    </div>
+
+    <!-- 資料輸入 -->
+    <div class="curve-panel active" id="curve-input">
+        <div class="card">
+            <div class="card-header">圖表標題設定</div>
+            <div class="input-group"><span class="input-label">年份範圍（例：2023-2025）</span>
+                <input type="text" id="cfg-years" class="custom-input" placeholder="例：2023-2025" oninput="saveCurveConfig()">
+            </div>
+            <div style="font-size:.75rem;color:var(--text-muted);">姓名和級別請在「設定」頁填寫，會自動同步到圖表標題。</div>
+        </div>
+        <div class="card">
+            <div class="card-header">新增月份資料</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">
+                <div class="input-group" style="margin-bottom:0;">
+                    <span class="input-label">年份</span>
+                    <div style="position:relative;"><select id="curve-year" class="month-select" style="font-size:.85rem;padding:10px 30px 10px 12px;"></select><span style="position:absolute;right:10px;top:50%;transform:translateY(-50%);color:var(--rose);pointer-events:none;font-size:.8rem;">▾</span></div>
+                </div>
+                <div class="input-group" style="margin-bottom:0;">
+                    <span class="input-label">月份</span>
+                    <div style="position:relative;"><select id="curve-month" class="month-select" style="font-size:.85rem;padding:10px 30px 10px 12px;">
+                        <option value="1">1月</option><option value="2">2月</option><option value="3">3月</option><option value="4">4月</option>
+                        <option value="5">5月</option><option value="6">6月</option><option value="7">7月</option><option value="8">8月</option>
+                        <option value="9">9月</option><option value="10">10月</option><option value="11">11月</option><option value="12">12月</option>
+                    </select><span style="position:absolute;right:10px;top:50%;transform:translateY(-50%);color:var(--rose);pointer-events:none;font-size:.8rem;">▾</span></div>
+                </div>
+            </div>
+            <div style="font-size:.75rem;font-weight:600;color:var(--text-sub);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px;">💰 淨利</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px;">
+                <div class="input-group" style="margin-bottom:0;"><span class="input-label" style="color:#5BC8C0;">零售</span><input type="number" id="cv-retail" class="custom-input" placeholder="0" style="border-left:3px solid #5BC8C0;"></div>
+                <div class="input-group" style="margin-bottom:0;"><span class="input-label" style="color:#3B6EDE;">團隊</span><input type="number" id="cv-team" class="custom-input" placeholder="0" style="border-left:3px solid #3B6EDE;"></div>
+                <div class="input-group" style="margin-bottom:0;"><span class="input-label" style="color:#9B82D4;">返利</span><input type="number" id="cv-rebate" class="custom-input" placeholder="0" style="border-left:3px solid #9B82D4;"></div>
+            </div>
+            <div style="font-size:.75rem;font-weight:600;color:var(--text-sub);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px;">👥 粉絲</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;">
+                <div class="input-group" style="margin-bottom:0;"><span class="input-label" style="color:#5BC8C0;">TikTok</span><input type="number" id="cv-tiktok" class="custom-input" placeholder="0" style="border-left:3px solid #5BC8C0;"></div>
+                <div class="input-group" style="margin-bottom:0;"><span class="input-label" style="color:var(--rose);">IG</span><input type="number" id="cv-ig" class="custom-input" placeholder="0" style="border-left:3px solid var(--rose);"></div>
+            </div>
+            <button class="save-btn" onclick="addCurveMonth()">＋ 新增這個月</button>
+        </div>
+        <div class="card">
+            <div class="card-header">月份資料（直接修改自動儲存）</div>
+            <div id="curve-edit-table"></div>
+        </div>
+    </div>
+
+    <!-- 淨利圖 -->
+    <div class="curve-panel" id="curve-profit">
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;" id="curve-stats1"></div>
+        <div class="card">
+            <div class="card-header" id="curve-chart1-title">淨利曲線圖</div>
+            <div style="font-size:.73rem;color:var(--text-muted);margin-bottom:10px;" id="curve-chart1-sub">三口袋月度淨利堆疊長條圖</div>
+            <div class="curve-legend">
+                <div class="curve-legend-item"><div class="curve-legend-box" style="background:#5BC8C0"></div>第一口袋 零售</div>
+                <div class="curve-legend-item"><div class="curve-legend-box" style="background:#3B6EDE"></div>第二口袋 團隊</div>
+                <div class="curve-legend-item"><div class="curve-legend-box" style="background:#9B82D4"></div>第三口袋 返利</div>
+            </div>
+            <div class="chart-wrap-curve"><canvas id="curve-chart1"></canvas></div>
+            <div style="font-size:.72rem;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin:14px 0 8px;padding-top:14px;border-top:1px solid var(--border);">📋 月份明細</div>
+            <div id="curve-table1"></div>
+        </div>
+    </div>
+
+    <!-- 粉絲圖 -->
+    <div class="curve-panel" id="curve-fans">
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;" id="curve-stats2"></div>
+        <div class="card">
+            <div class="card-header" id="curve-chart2-title">粉絲曲線圖</div>
+            <div style="font-size:.73rem;color:var(--text-muted);margin-bottom:10px;" id="curve-chart2-sub">TikTok + IG 月度粉絲堆疊長條圖</div>
+            <div class="curve-legend">
+                <div class="curve-legend-item"><div class="curve-legend-box" style="background:#5BC8C0"></div>TikTok</div>
+                <div class="curve-legend-item"><div class="curve-legend-box" style="background:var(--rose)"></div>IG</div>
+            </div>
+            <div class="chart-wrap-curve"><canvas id="curve-chart2"></canvas></div>
+            <div style="font-size:.72rem;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin:14px 0 8px;padding-top:14px;border-top:1px solid var(--border);">📋 月份明細</div>
+            <div id="curve-table2"></div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Edit Modal -->
+<div class="modal-overlay" id="editModal" onclick="closeEditModal(event)">
+    <div class="modal-sheet">
+        <div class="modal-handle"></div>
+        <div class="modal-title" id="editModalTitle">編輯訂單</div>
+        <div id="editModalContent"></div>
+    </div>
+</div>
 
 <script>
-// ══════════════════════════════════════════
-//  STATE
-// ══════════════════════════════════════════
-const STORAGE_KEY = 'dct_monthly_data_v1';
-const CONFIG_KEY  = 'dct_config_v1';
-let db  = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
-let cfg = JSON.parse(localStorage.getItem(CONFIG_KEY)  || '{}');
+const products={
+    "益生菌 買三送一":{cat:"活動",unit:"組",L2:2310,L3_sup:2490,L3_ret:2580,intern:2970,vip:3300,discount:3300,retail:3300},
+    "葉黃素凍 買三送一":{cat:"活動",unit:"組",L2:1230,L3_sup:1320,L3_ret:1365,intern:1590,vip:1800,discount:1800,retail:1800},
+    "纖纖飲X":{cat:"纖體",unit:"盒",L2:880,L3_sup:955,L3_ret:990,intern:1160,vip:1280,discount:1380,retail:1480},
+    "纖飄錠":{cat:"纖體",unit:"盒",L2:880,L3_sup:955,L3_ret:990,intern:1160,vip:1280,discount:1380,retail:1480},
+    "雪花紫纖飲":{cat:"纖體",unit:"盒",L2:580,L3_sup:635,L3_ret:660,intern:780,vip:830,discount:900,retail:990},
+    "爆纖錠":{cat:"纖體",unit:"盒",L2:520,L3_sup:560,L3_ret:580,intern:660,vip:740,discount:800,retail:880},
+    "植萃纖酵素":{cat:"纖體",unit:"盒",L2:580,L3_sup:635,L3_ret:660,intern:780,vip:830,discount:900,retail:990},
+    "肽纖飲（可可風味）":{cat:"纖體",unit:"盒",L2:580,L3_sup:635,L3_ret:660,intern:780,vip:830,discount:900,retail:990},
+    "肽纖飲（奶茶風味）":{cat:"纖體",unit:"盒",L2:580,L3_sup:635,L3_ret:660,intern:780,vip:830,discount:900,retail:990},
+    "水光錠":{cat:"美肌",unit:"盒",L2:920,L3_sup:1040,L3_ret:1080,intern:1260,vip:1480,discount:1580,retail:1680},
+    "水光面膜（精裝盒5片）":{cat:"美肌",unit:"盒",L2:450,L3_sup:485,L3_ret:500,intern:550,vip:600,discount:650,retail:700},
+    "水光面膜（單片）":{cat:"美肌",unit:"片",L2:80,L3_sup:87,L3_ret:90,intern:100,vip:150,discount:110,retail:150},
+    "雪聚露":{cat:"美肌",unit:"盒",L2:770,L3_sup:830,L3_ret:860,intern:990,vip:1100,discount:1180,retail:1280},
+    "婕肌零":{cat:"美肌",unit:"盒",L2:580,L3_sup:635,L3_ret:660,intern:780,vip:830,discount:900,retail:990},
+    "玻尿酸":{cat:"美肌",unit:"盒",L2:580,L3_sup:635,L3_ret:660,intern:780,vip:830,discount:900,retail:990},
+    "急救小白瓶":{cat:"美肌",unit:"盒",L2:770,L3_sup:830,L3_ret:860,intern:990,vip:1100,discount:1180,retail:1280},
+    "護手霜":{cat:"美肌",unit:"盒",L2:410,L3_sup:440,L3_ret:455,intern:530,vip:600,discount:630,retail:680},
+    "高機能益生菌":{cat:"保健",unit:"盒",L2:770,L3_sup:830,L3_ret:860,intern:990,vip:1100,discount:1180,retail:1280},
+    "葉黃素晶亮凍":{cat:"保健",unit:"盒",L2:410,L3_sup:440,L3_ret:455,intern:530,vip:600,discount:630,retail:680},
+    "固樂纖":{cat:"保健",unit:"盒",L2:920,L3_sup:1040,L3_ret:1080,intern:1260,vip:1480,discount:1580,retail:1680},
+    "爆纖錠體驗包":{cat:"纖體",unit:"包",L2:146,L3_sup:158,L3_ret:164,intern:190,vip:240,discount:240,retail:240},
+    "植萃纖酵宿體驗包":{cat:"纖體",unit:"包",L2:103,L3_sup:113,L3_ret:117,intern:145,vip:190,discount:190,retail:190},
+    "9國英雄TURBO極速錠":{cat:"保健",unit:"盒",L2:410,L3_sup:440,L3_ret:455,intern:530,vip:600,discount:630,retail:680},
+    "療肺草正冠茶":{cat:"保健",unit:"盒",L2:580,L3_sup:635,L3_ret:660,intern:780,vip:830,discount:900,retail:990},
+    "葉黃素EX飲":{cat:"保健",unit:"盒",L2:640,L3_sup:695,L3_ret:720,intern:840,vip:900,discount:990,retail:1080},
+    "法樂蓬洗髮露":{cat:"美肌",unit:"瓶",L2:770,L3_sup:830,L3_ret:860,intern:990,vip:1100,discount:1180,retail:1280},
+    "法樂蓬養髮原液":{cat:"美肌",unit:"瓶",L2:640,L3_sup:695,L3_ret:720,intern:840,vip:900,discount:990,retail:1080},
+    "法樂蓬洗髮露體驗包":{cat:"美肌",unit:"包",L2:17,L3_sup:20,L3_ret:21,intern:24,vip:30,discount:30,retail:30},
+    "婕肌零體驗包":{cat:"美肌",unit:"包",L2:20,L3_sup:24,L3_ret:25,intern:30,vip:40,discount:40,retail:40}
+};
+const quotes=["每一次成交都是因為妳傳遞了價值。","溫柔且堅定，讓妳的專業帶領客戶。","最好的招商力，就是活出妳想要的樣子。","目標不是用來達成的，是用來超越的。","真正的領袖，是把身邊的人都帶向更好的地方。","今天的每一步，都是明天格局的地基。","妳的自律，就是妳最強的名片。","不是等到準備好了才開始，是開始了才會準備好。","每一個相信妳的客人，都值得妳最真誠的回應。","成功從來不是偶然，是每一天選擇累積的結果。","妳的能量，決定妳吸引到的人。","把服務做到讓客人捨不得離開。","學會感謝每一個說不的人，他們讓妳更精準。","今日的業績，是昨日種下的信任。","妳不是在賣產品，妳是在傳遞一種生活方式。","讓自己發光，就是最好的行銷。","堅持，是把普通人和成功者分開的那條線。","每一通訊息背後，都可能是一個改變的開始。","妳的故事，就是妳最有說服力的案例。","不用完美，但要真實。","把每一位客人當成朋友，生意就會長久。","成長的速度，取決於妳願意學習的深度。","妳的熱情是會感染人的，請大方展現它。","相信自己，是所有行動最重要的前提。","今天比昨天多努力一點，就是進步。","妳的限制，往往只存在於妳的想法裡。","用心服務一個人，她會幫妳介紹十個人。","記錄每一筆成交，讓數字告訴妳妳有多厲害。","做生意最重要的資產，是關係。","不要害怕被拒絕，每一個不是都讓妳離對的人更近。","妳選擇的事業，值得妳全力以赴。","把困難看成課題，把挫折看成養分。","每天早晨，都是重新出發的機會。","細節決定信任，信任創造業績。","讓妳的專業成為客人最安心的依靠。","今天種下的善意，明天會開成花。","妳的堅持，終將被看見。","成功不是終點，是一種持續的狀態。","妳有多愛這份事業，客人就有多感受得到。","信念有多強，舞台就有多大。"];
+const levels=[{id:"L2",name:"二級輔導"},{id:"L3_sup",name:"三級輔導"},{id:"L3_ret",name:"三級零售"},{id:"intern",name:"實習零售"}];
+const buyers=[
+    {id:"retail",name:"單盒零售",t:"retail"},{id:"vip",name:"VIP 價",t:"retail"},{id:"discount",name:"兩盒優惠",t:"retail"},
+    {id:"intern",name:"實習價",t:"team"},{id:"L3_ret",name:"三級價",t:"team"},{id:"L3_sup",name:"三級輔導",t:"team"}
+];
+let currentSeller="L3_sup",currentBuyer="retail",currentCat="活動",cart={};
+let editingOrderId=null,editCart={},editBuyerType=null,selectedHistoryKey=null;
 
-let chartInstances = {};
+function getOrders(){return JSON.parse(localStorage.getItem('dct_v9_ultimate'))||[];}
+function saveOrders(rs){localStorage.setItem('dct_v9_ultimate',JSON.stringify(rs));}
+function getProfile(){return JSON.parse(localStorage.getItem('dct_profile'))||{};}
+function saveProfileData(p){localStorage.setItem('dct_profile',JSON.stringify(p));}
+function getOrderDate(r){return r.orderDate?new Date(r.orderDate):new Date(r.id);}
+function toLocalISO(d){return new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,16);}
 
-function saveDB() { localStorage.setItem(STORAGE_KEY, JSON.stringify(db)); }
-function saveConfig() {
-  cfg = {
-    name:   document.getElementById('cfg-name').value.trim(),
-    level:  document.getElementById('cfg-level').value.trim(),
-    upline: document.getElementById('cfg-upline').value.trim(),
-    years:  document.getElementById('cfg-years').value.trim(),
-  };
-  localStorage.setItem(CONFIG_KEY, JSON.stringify(cfg));
-  applyConfig();
+
+function fixLayout(){
+    const tb=document.getElementById('topBar');
+    if(!tb) return;
+    document.body.style.paddingTop=tb.offsetHeight+'px';
 }
-function applyConfig() {
-  document.getElementById('cfg-name').value   = cfg.name   || '';
-  document.getElementById('cfg-level').value  = cfg.level  || '';
-  document.getElementById('cfg-upline').value = cfg.upline || '';
-  document.getElementById('cfg-years').value  = cfg.years  || '';
+window.addEventListener('resize',fixLayout);
 
-  const name   = cfg.name   ? cfg.name.trim() : '';
-  const level  = cfg.level  ? ` ｜ ${cfg.level}`  : '';
-  const upline = cfg.upline ? ` ｜ 上家：${cfg.upline}` : '';
-  const years  = cfg.years  ? cfg.years.trim() : '';
 
-  document.getElementById('chart1-title').textContent = [years, name, '淨利'].filter(Boolean).join(' ');
-  document.getElementById('chart1-sub').textContent   = `三口袋月度淨利${level}${upline}`;
-  document.getElementById('chart2-title').textContent = [years, name, '粉絲'].filter(Boolean).join(' ');
-  document.getElementById('chart2-sub').textContent   = `TikTok + IG 月度粉絲${level}${upline}`;
+// Prevent iOS pinch zoom
+document.addEventListener('gesturestart', function(e){ e.preventDefault(); });
+document.addEventListener('gesturechange', function(e){ e.preventDefault(); });
+document.addEventListener('gestureend', function(e){ e.preventDefault(); });
+document.addEventListener('touchmove', function(e){
+    if(e.touches.length > 1) e.preventDefault();
+}, {passive:false});
+
+function showToast(msg, color){
+    const t=document.getElementById('toast');
+    t.textContent=msg;
+    t.style.background=color||'#2C2226';
+    t.classList.add('show');
+    clearTimeout(t._timer);
+    t._timer=setTimeout(()=>t.classList.remove('show'),2200);
 }
-
-function getKey(y, m) { return `${y}-${String(m).padStart(2,'0')}`; }
-function keyLabel(k) {
-  const [y, m] = k.split('-');
-  return `${y.slice(2)}年${parseInt(m)}月`;
-}
-
-function getSortedKeys() {
-  return Object.keys(db).sort();
-}
-
-// ══════════════════════════════════════════
-//  INIT
-// ══════════════════════════════════════════
-function init() {
-  // Populate year selector
-  const yearSel = document.getElementById('inp-year');
-  const curYear = new Date().getFullYear();
-  for (let y = 2022; y <= curYear + 2; y++) {
-    const o = document.createElement('option');
-    o.value = y; o.textContent = y + '年';
-    if (y === curYear) o.selected = true;
-    yearSel.appendChild(o);
-  }
-  document.getElementById('inp-month').value = new Date().getMonth() + 1;
-  applyConfig();
-  refreshAll();
-}
-
-// ══════════════════════════════════════════
-//  TABS
-// ══════════════════════════════════════════
-function switchTab(name) {
-  document.querySelectorAll('.tab-btn').forEach((b,i) => {
-    const names = ['input','chart1','chart2'];
-    b.classList.toggle('active', names[i] === name);
-  });
-  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-  document.getElementById('panel-' + name).classList.add('active');
-  if (name !== 'input') renderCharts();
-}
-
-// ══════════════════════════════════════════
-//  ADD NEW MONTH
-// ══════════════════════════════════════════
-function addNewMonth() {
-  const y = document.getElementById('inp-year').value;
-  const m = document.getElementById('inp-month').value;
-  const key = getKey(y, m);
-  if (db[key]) { showToast('此月份已存在，請直接在表格修改'); return; }
-  db[key] = {
-    retail: parseInt(document.getElementById('inp-retail').value) || 0,
-    team:   parseInt(document.getElementById('inp-team').value)   || 0,
-    rebate: parseInt(document.getElementById('inp-rebate').value) || 0,
-    tiktok: parseInt(document.getElementById('inp-tiktok').value) || 0,
-    ig:     parseInt(document.getElementById('inp-ig').value)     || 0,
-  };
-  saveDB();
-  // Clear inputs
-  ['inp-retail','inp-team','inp-rebate','inp-tiktok','inp-ig'].forEach(id => {
-    document.getElementById(id).value = '';
-  });
-  refreshAll();
-  document.getElementById('summary-table-wrap').scrollIntoView({ behavior:'smooth', block:'start' });
-  showToast('🎊 已新增 ' + y + '年' + parseInt(m) + '月');
+function dismissWelcome(){
+    const o=document.getElementById('welcomeOverlay');
+    o.classList.add('fade-out');
+    setTimeout(()=>{o.style.display='none';},500);
 }
 
-// ══════════════════════════════════════════
-//  REFRESH ALL
-// ══════════════════════════════════════════
-function refreshAll() {
-  renderChips();
-  renderSummaryTable();
-  renderCharts();
-}
-
-// ══════════════════════════════════════════
-//  CHARTS
-// ══════════════════════════════════════════
-Chart.register(ChartDataLabels);
-
-const CHART_DEFAULTS = {
-  plugins: {
-    legend: { display: false },
-    tooltip: {
-      backgroundColor: '#fff8f0',
-      titleColor: '#3a2010',
-      bodyColor: '#9a7a60',
-      borderColor: '#ddd0c0',
-      borderWidth: 1,
-      padding: 10,
-      callbacks: {
-        label: ctx => ' ' + ctx.dataset.label + ': ' + fmtNum(ctx.parsed.y)
-      }
-    },
-    datalabels: {
-      display: ctx => ctx.dataset.data[ctx.dataIndex] > 0,
-      color: '#fff',
-      font: { size: 10, weight: '600', family: 'DM Mono' },
-      formatter: v => v === 0 ? '' : fmtK(v),
-      anchor: 'center',
-      align: 'center',
-      padding: 1,
-      // Only show label on top segment (last dataset) as total above bar
-      listeners: {}
-    }
-  },
-  scales: {
-    x: {
-      stacked: true,
-      ticks: { color: '#9a7a60', font: { size: 11 } },
-      grid: { display: false },
-    },
-    y: {
-      stacked: true,
-      ticks: { color: '#9a7a60', font: { size: 10 }, callback: v => fmtK(v) },
-      grid: { color: 'rgba(0,0,0,.06)' },
-    }
-  },
-  responsive: true,
-  maintainAspectRatio: false,
-  animation: { duration: 600 }
+window.onload=()=>{
+    // Welcome screen
+    const p=getProfile();
+    const greet=document.getElementById('welcomeGreeting');
+    const sub=document.getElementById('welcomeSub');
+    if(p.name){ greet.innerText=`歡迎回來，${p.name} 👋`; sub.innerText=`${p.level||''}\n記錄每一筆，讓數字見證妳的努力`; }
+    // Auto dismiss after 2s if profile set
+    setTimeout(dismissWelcome, 1000);
+    const lastQ=parseInt(localStorage.getItem('dct_last_quote')??'-1');
+    let idx; do{idx=Math.floor(Math.random()*quotes.length);}while(idx===lastQ&&quotes.length>1);
+    localStorage.setItem('dct_last_quote',idx);
+    document.getElementById('dailyQuote').innerText=quotes[idx];
+    document.getElementById('orderDate').value=toLocalISO(new Date());
+    loadProfileUI(); initOrderUI(); loadDashboards(); initManualYearSelect();
+    fixLayout();
+    setTimeout(fixLayout, 300);
 };
 
-function fmtNum(n) {
-  if (n === undefined || n === null) return '0';
-  return Number(n).toLocaleString('zh-TW');
+function loadProfileUI(){
+    const p=getProfile();
+    document.getElementById('settingName').value=p.name||'';
+    document.getElementById('settingLevel').value=p.level||'';
+    document.getElementById('settingUpline').value=p.upline||'';
+    updateProfileDisplay(p);
 }
-function fmtK(n) {
-  if (n >= 1000000) return (n/1000000).toFixed(1) + 'M';
-  if (n >= 10000) return (n/10000).toFixed(0) + 'w';
-  if (n >= 1000) return (n/1000).toFixed(0) + 'k';
-  return n;
+const levelMap={'二級輔導':'L2','三級輔導':'L3_sup','三級零售':'L3_ret','實習':'intern','一級輔導':'L2','執行':'L2','銀牌執行':'L2','金牌執行':'L2'};
+function saveProfile(){
+    const p={name:document.getElementById('settingName').value,level:document.getElementById('settingLevel').value,upline:document.getElementById('settingUpline').value};
+    saveProfileData(p);updateProfileDisplay(p);
+    // Sync level to 開單 seller selector
+    if(p.level && levelMap[p.level]){
+        currentSeller=levelMap[p.level];
+        const ss=document.getElementById('sellerSelect');
+        if(ss) ss.value=currentSeller;
+        renderProducts(); updateCalc();
+    }
 }
-function delta(cur, prev) {
-  if (prev === undefined || prev === null) return null;
-  return cur - prev;
-}
-
-function renderCharts() {
-  const keys = getSortedKeys();
-  if (!keys.length) {
-    clearChart('chart1'); clearChart('chart2');
-    ['table1','table2'].forEach(id => {
-      document.getElementById(id + '-wrap').innerHTML = '<div class="empty"><div class="empty-icon" style="animation:float 2s ease-in-out infinite">🌿</div>尚無資料，快去新增吧！</div>';
-    });
-    ['stats1','stats2'].forEach(id => document.getElementById(id).innerHTML = '');
-    return;
-  }
-
-  const labels = keys.map(k => {
-    const [y, m] = k.split('-');
-    return parseInt(m) + '月';
-  });
-
-  const retail = keys.map(k => db[k].retail || 0);
-  const team   = keys.map(k => db[k].team   || 0);
-  const rebate = keys.map(k => db[k].rebate  || 0);
-  const tiktok = keys.map(k => db[k].tiktok  || 0);
-  const ig     = keys.map(k => db[k].ig      || 0);
-
-  // Chart 1 – 淨利
-  buildChart('chart1', {
-    labels,
-    datasets: [
-      { label: '第一口袋 零售', data: retail, backgroundColor: '#7ecfda', borderWidth: 0 },
-      { label: '第二口袋 團隊', data: team,   backgroundColor: '#1f6feb', borderWidth: 0 },
-      { label: '第三口袋 返利', data: rebate, backgroundColor: '#8b5cf6', borderWidth: 0 },
-    ]
-  });
-  buildStats('stats1', [
-    { label: '最新月總淨利', val: fmtNum(retail.at(-1)+team.at(-1)+rebate.at(-1)), sub: deltaStr(retail.at(-1)+team.at(-1)+rebate.at(-1), keys.length>1 ? retail.at(-2)+team.at(-2)+rebate.at(-2) : null) },
-    { label: '零售最高月', val: fmtNum(Math.max(...retail)) },
-    { label: '累計總淨利', val: fmtNum(retail.reduce((a,b)=>a+b,0)+team.reduce((a,b)=>a+b,0)+rebate.reduce((a,b)=>a+b,0)) },
-  ]);
-  buildDetailTable('table1-wrap', keys, ['零售','團隊','返利'], [retail,team,rebate], '#7ecfda,#1f6feb,#8b5cf6'.split(','));
-
-  // Chart 2 – 粉絲
-  const totalFollowers = tiktok.map((t,i) => t + ig[i]);
-  const followerDelta  = totalFollowers.map((v,i) => i === 0 ? null : v - totalFollowers[i-1]);
-  buildChart('chart2', {
-    labels,
-    datasets: [
-      { label: 'TikTok', data: tiktok, backgroundColor: '#5bc4d0', borderWidth: 0 },
-      { label: 'IG',     data: ig,     backgroundColor: '#1e5fcc', borderWidth: 0 },
-    ]
-  }, followerDelta);
-  buildStats('stats2', [
-    { label: '最新月總粉絲', val: fmtNum(totalFollowers.at(-1)), sub: deltaStr(totalFollowers.at(-1), keys.length>1 ? totalFollowers.at(-2) : null) },
-    { label: 'TikTok 最新', val: fmtNum(tiktok.at(-1)), sub: deltaStr(tiktok.at(-1), keys.length>1 ? tiktok.at(-2) : null) },
-    { label: 'IG 最新', val: fmtNum(ig.at(-1)), sub: deltaStr(ig.at(-1), keys.length>1 ? ig.at(-2) : null) },
-  ]);
-  buildDetailTable('table2-wrap', keys, ['TikTok','IG'], [tiktok,ig], ['#5bc4d0','#1e5fcc']);
+function updateProfileDisplay(p){
+    document.getElementById('profileNameDisplay').innerText=p.name||'—';
+    document.getElementById('profileSubDisplay').innerText=[p.level,p.upline?'上家：'+p.upline:''].filter(Boolean).join(' ｜ ')||'尚未設定';
+    const hp=document.getElementById('headerProfile');
+    const pt=document.getElementById('headerProfileText');
+    if(p.name){
+        pt.innerHTML=`<span style="font-weight:600;display:block">${p.name}</span>${p.level?`<span style="opacity:.75">${p.level}</span>`:''}`;
+        hp.style.display='flex';
+    } else { hp.style.display='none'; }
 }
 
-function clearChart(id) {
-  if (chartInstances[id]) { chartInstances[id].destroy(); delete chartInstances[id]; }
+function initOrderUI(){
+    const ss=document.getElementById('sellerSelect'); if(ss) ss.value=currentSeller;
+    document.getElementById('buyerSelector').innerHTML=buyers.map(b=>`<div class="buyer-btn ${b.id===currentBuyer?'active':''}" onclick="currentBuyer='${b.id}';initOrderUI();updateCalc();">${b.name}</div>`).join('');
+    renderProducts();
+    document.getElementById('mGoalInput').value=localStorage.getItem('dct_goal')||0;
+}
+function renderProducts(){
+    const div=document.getElementById('productList');div.innerHTML='';
+    for(let n in products){
+        if(products[n].cat!==currentCat) continue;
+        const qty=cart[n]||0,cp=products[n][currentSeller],sp=products[n][currentBuyer],profit=sp-cp;
+        div.innerHTML+=`<div class="product-item"><div style="flex:1;min-width:0;"><div class="product-name">${n}</div><div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:3px;"><span style="font-size:.71rem;color:var(--text-muted)">成本$${cp.toLocaleString()}</span><span style="font-size:.67rem;color:var(--beige-dark)">→</span><span style="font-size:.78rem;color:var(--rose);font-weight:600">售$${sp.toLocaleString()}</span><span style="font-size:.69rem;color:${profit>=0?'var(--rose)':'#e05050'}">利$${profit.toLocaleString()}</span></div></div><div class="qty-control"><button class="btn-qty" onclick="changeQty('${n}',-1)">−</button><div class="qty-input">${qty}</div><button class="btn-qty" onclick="changeQty('${n}',1)">+</button></div></div>`;
+    }
+}
+function changeQty(n,d){cart[n]=Math.max(0,(cart[n]||0)+d);renderProducts();updateCalc();}
+function updateCalc(){
+    let cost=0,rev=0,extra=parseInt(document.getElementById('extraCost').value)||0;
+    for(let n in cart){cost+=products[n][currentSeller]*cart[n];rev+=products[n][currentBuyer]*cart[n];}
+    document.getElementById('revDisplay').innerText=`$${rev.toLocaleString()}`;
+    document.getElementById('profitDisplay').innerText=`預估淨利 $${(rev-cost-extra).toLocaleString()}`;
+    document.getElementById('costDisplay').innerText=`總成本（含額外）$${(cost+extra).toLocaleString()}`;
+}
+function saveOrder(){
+    let items=[],cost=0,rev=0,extra=parseInt(document.getElementById('extraCost').value)||0;
+    for(let n in cart){if(cart[n]>0){items.push({name:n,qty:cart[n],unit:products[n].unit,cat:products[n].cat});cost+=products[n][currentSeller]*cart[n];rev+=products[n][currentBuyer]*cart[n];}}
+    if(!items.length){showToast("⚠ 請先選擇產品數量","#C8748A");return;}
+    const dateVal=document.getElementById('orderDate').value;
+    const orderDateTs=dateVal?new Date(dateVal).getTime():Date.now();
+    const d=new Date(orderDateTs);
+    const rs=getOrders();
+    rs.push({id:Date.now(),orderDate:orderDateTs,year:d.getFullYear(),month:d.getMonth(),sellerLevel:currentSeller,buyerType:currentBuyer,profit:rev-cost-extra,rev,cost:cost+extra,itemsCost:cost,extraCost:extra,type:buyers.find(b=>b.id===currentBuyer).t,note:document.getElementById('orderNote').value||'無備註',items});
+    saveOrders(rs);
+    cart={};document.getElementById('orderNote').value='';document.getElementById('extraCost').value='';
+    document.getElementById('orderDate').value=toLocalISO(new Date());
+    initOrderUI();updateCalc();loadDashboards();renderChart();
+    showToast('✓ 訂單儲存成功', 'var(--rose)');
 }
 
-function buildChart(id, data, deltaArr) {
-  clearChart(id);
-  const opts = JSON.parse(JSON.stringify(CHART_DEFAULTS));
-  opts.layout = { padding: { top: deltaArr ? 52 : 38 } };
+function switchTab(id,el){
+    document.querySelectorAll('.container').forEach(c=>c.classList.remove('active'));
+    document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+    document.getElementById(id).classList.add('active');el.classList.add('active');
+    if(id==='tab-new') window.scrollTo({top:0,behavior:'smooth'});
+    if(id==='tab-daily'||id==='tab-monthly') loadDashboards();
+    if(id==='tab-history') loadHistory();
+    if(id==='tab-chart'){ renderChart(); initManualYearSelect(); }
+}
+function switchCat(cat,el){currentCat=cat;document.querySelectorAll('.cat-tab').forEach(t=>t.classList.remove('active'));el.classList.add('active');renderProducts();}
+function updateGoal(v){localStorage.setItem('dct_goal',v);loadDashboards();}
 
-  // Disable datalabels plugin entirely
-  data.datasets.forEach(ds => { ds.datalabels = { display: false }; });
-  opts.plugins.datalabels = { display: false };
-
-  // ── Custom afterDraw: draw segment values + total + delta manually ──
-  const customLabels = {
-    id: 'customLabels_' + id,
-    afterDraw(chart) {
-      const ctx = chart.ctx;
-      const nDS = chart.data.datasets.length;
-
-      chart.data.datasets.forEach((dataset, dsIdx) => {
-        const meta = chart.getDatasetMeta(dsIdx);
-        meta.data.forEach((bar, barIdx) => {
-          const value = dataset.data[barIdx];
-          if (!value) return;
-          const segH = Math.abs(bar.base - bar.y);
-          if (segH < 16) return;
-
-          const cx = bar.x;
-          const cy = (bar.y + bar.base) / 2;
-
-          // Yellow label with dark bg
-          const label = fmtK(value);
-          ctx.font = 'bold 10px "DM Mono", monospace';
-          const tw = ctx.measureText(label).width;
-          const pad = 3, rh = 14, rw = tw + pad * 2;
-
-          ctx.fillStyle = 'rgba(0,0,0,0.45)';
-          roundRect(ctx, cx - rw/2, cy - rh/2, rw, rh, 2);
-          ctx.fill();
-
-          ctx.fillStyle = '#FFE566';
-          ctx.textAlign = 'center';
-          ctx.textBaseline = 'middle';
-          ctx.fillText(label, cx, cy);
-        });
-      });
-
-      // ── Totals + deltas above each bar ──
-      const topMeta = chart.getDatasetMeta(nDS - 1);
-      topMeta.data.forEach((bar, barIdx) => {
-        const total = data.datasets.reduce((s, ds) => s + (ds.data[barIdx] || 0), 0);
-        if (!total) return;
-
-        const cx = bar.x;
-        let topY = bar.y - 5;
-
-        // Delta (粉絲圖)
-        if (deltaArr) {
-          const d = deltaArr[barIdx];
-          if (d !== null && d !== undefined) {
-            const dLabel = (d >= 0 ? '+' : '') + fmtK(d);
-            ctx.font = 'bold 9px "DM Mono", monospace';
-            ctx.fillStyle = d >= 0 ? '#3fb950' : '#f85149';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'bottom';
-            ctx.fillText(dLabel, cx, topY - 1);
-            topY -= 13;
-          }
+function loadDashboards(){
+    const rs=getOrders();
+    const todayStr=new Date().toDateString(),curM=new Date().getMonth(),curY=new Date().getFullYear();
+    const lastM=curM===0?11:curM-1,lastY=curM===0?curY-1:curY;
+    let dP=0,dR=0,dC=0,dI={},dL='',mR=0,mP=0,mC=0,mRR=0,mTR=0,mI={},lR=0,lP=0,lC=0;
+    let ser={"活動":0,"纖體":0,"美肌":0,"保健":0};
+    rs.forEach(r=>{
+        const rd=getOrderDate(r);
+        if(rd.toDateString()===todayStr){
+            dP+=r.profit;dR+=r.rev;dC+=r.cost;
+            r.items.forEach(i=>dI[i.name]={q:(dI[i.name]?.q||0)+i.qty,u:i.unit});
+            const bl=buyers.find(b=>b.id===r.buyerType)?.name||r.type;
+            const back=r.orderDate&&new Date(r.orderDate).toDateString()!==new Date(r.id).toDateString();
+            dL+=`<div class="order-card"><div class="order-card-header"><div><div class="order-note">${r.note}${back?'<span class="date-badge">補登</span>':''}</div><div style="font-size:.72rem;color:var(--text-muted);margin-top:2px">${bl} · ${rd.toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'})}</div></div><div class="order-profit">+$${r.profit.toLocaleString()}</div></div><div class="order-items">${r.items.map(i=>`${i.name}×${i.qty}`).join(' · ')}</div><div class="order-actions"><button class="action-btn edit" onclick="openEditModal(${r.id})">✏ 編輯</button><button class="action-btn" onclick="deleteAndRefresh(${r.id})">刪除</button></div></div>`;
         }
+        if(rd.getMonth()===curM&&rd.getFullYear()===curY){mR+=r.rev;mP+=r.profit;mC+=r.cost;if(r.type==='retail')mRR+=r.rev;else mTR+=r.rev;r.items.forEach(i=>{mI[i.name]={q:(mI[i.name]?.q||0)+i.qty,u:i.unit};ser[i.cat]+=r.rev;});}
+        if(rd.getMonth()===lastM&&rd.getFullYear()===lastY){lR+=r.rev;lP+=r.profit;lC+=r.cost;}
+    });
+    document.getElementById('dTotalProfit').innerText=`$${dP.toLocaleString()}`;
+    document.getElementById('dTotalRev').innerText=`$${dR.toLocaleString()}`;
+    document.getElementById('dTotalCost').innerText=`$${dC.toLocaleString()}`;
+    document.getElementById('dOrderList').innerHTML=dL||'<span style="font-size:.81rem;color:var(--text-muted)">今日尚未開單</span>';
+    let dIH='';for(let n in dI)dIH+=`<div class="item-row"><span>${n}</span><b>${dI[n].q} ${dI[n].u}</b></div>`;
+    document.getElementById('dItemStats').innerHTML=dIH||'<span style="font-size:.81rem;color:var(--text-muted)">無數據</span>';
+    document.getElementById('mTotalRev').innerText=`$${mR.toLocaleString()}`;
+    document.getElementById('mTotalCost').innerText=`$${mC.toLocaleString()}`;
+    document.getElementById('mTotalProfit').innerText=`$${mP.toLocaleString()}`;
+    document.getElementById('lastMRev').innerText=`$${lR.toLocaleString()}`;
+    document.getElementById('lastMProfit').innerText=`$${lP.toLocaleString()}`;
+    document.getElementById('lastMCost').innerText=`$${lC.toLocaleString()}`;
+    let g=localStorage.getItem('dct_goal')||0,gp=g>0?Math.min(Math.round(mP/g*100),100):0;
+    document.getElementById('mGoalPercent').innerText=gp+'%';document.getElementById('mGoalBar').style.width=gp+'%';
+    let mrp=mR>0?Math.round(mRR/mR*100):0,mtp=mR>0?Math.round(mTR/mR*100):0;
+    document.getElementById('mRetailP').innerText=mrp+'%';document.getElementById('mTeamP').innerText=mtp+'%';
+    document.getElementById('mRetailBar').style.width=mrp+'%';document.getElementById('mTeamBar').style.width=mtp+'%';
+    let mIH='';Object.entries(mI).sort((a,b)=>b[1].q-a[1].q).forEach(e=>mIH+=`<div class="item-row"><span>${e[0]}</span><b>${e[1].q} ${e[1].u}</b></div>`);
+    document.getElementById('mItemStats').innerHTML=mIH||'<span style="font-size:.81rem;color:var(--text-muted)">無數據</span>';
+    const sC={"活動":"#C8748A","纖體":"#7BBFDB","美肌":"#A98BC7","保健":"#7AB894"};
+    let ts=Object.values(ser).reduce((a,b)=>a+b,0),sH='';
+    for(let s in ser){let p=ts>0?Math.round(ser[s]/ts*100):0;sH+=`<div class="series-container"><div class="series-label"><span>${s}</span><span>${p}%</span></div><div class="series-bar"><div class="series-fill" style="width:${p}%;background:${sC[s]}"></div></div></div>`;}
+    document.getElementById('seriesChart').innerHTML=sH;
+}
 
-        // Total badge
-        const totalLabel = fmtK(total);
-        ctx.font = 'bold 10px "DM Mono", monospace';
-        const tw = ctx.measureText(totalLabel).width;
-        const pad = 4, rh = 15, rw = tw + pad * 2;
-
-        ctx.fillStyle = 'rgba(10,10,10,0.68)';
-        roundRect(ctx, cx - rw/2, topY - rh, rw, rh, 3);
-        ctx.fill();
-
-        ctx.fillStyle = '#ffffff';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'bottom';
-        ctx.fillText(totalLabel, cx, topY - 1);
-      });
+// HISTORY
+function loadHistory(){
+    const rs=getOrders();
+    const set=new Set();
+    rs.forEach(r=>{const d=getOrderDate(r);set.add(`${d.getFullYear()}-${d.getMonth()}`);});
+    // Also include manual entry months in picker
+    Object.keys(getManualData()).forEach(k=>set.add(k));
+    const keys=Array.from(set).sort((a,b)=>b.localeCompare(a));
+    const sel=document.getElementById('monthSelect');
+    const prev=sel.value||selectedHistoryKey;
+    sel.innerHTML='<option value="">— 請選擇月份 —</option>';
+    keys.forEach(k=>{const[y,mo]=k.split('-');const o=document.createElement('option');o.value=k;o.textContent=`${y}年${parseInt(mo)+1}月`;sel.appendChild(o);});
+    if(keys.length){
+        if(prev&&keys.includes(prev))sel.value=prev;
+        else{sel.value=keys[0];selectedHistoryKey=keys[0];}
     }
-  };
-
-  const ctx = document.getElementById(id).getContext('2d');
-  chartInstances[id] = new Chart(ctx, {
-    type: 'bar',
-    data,
-    options: opts,
-    plugins: [ChartDataLabels, customLabels]
-  });
+    renderHistoryMonth();
 }
-
-function roundRect(ctx, x, y, w, h, r) {
-  ctx.beginPath();
-  ctx.moveTo(x + r, y);
-  ctx.lineTo(x + w - r, y);
-  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
-  ctx.lineTo(x + w, y + h - r);
-  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
-  ctx.lineTo(x + r, y + h);
-  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
-  ctx.lineTo(x, y + r);
-  ctx.quadraticCurveTo(x, y, x + r, y);
-  ctx.closePath();
-}
-
-function buildStats(id, items) {
-  document.getElementById(id).innerHTML = items.map(s =>
-    `<div class="stat-pill"><div class="label">${s.label}</div><div class="value">${s.val}</div>${s.sub ? `<div class="${s.sub.startsWith('+') ? 'delta-pos' : s.sub.startsWith('-') ? 'delta-neg' : 'stat-pill label'}">${s.sub}</div>` : ''}</div>`
-  ).join('');
-}
-
-function deltaStr(cur, prev) {
-  if (prev === null || prev === undefined) return '';
-  const d = cur - prev;
-  if (d === 0) return '±0';
-  return (d > 0 ? '+' : '') + fmtNum(d);
-}
-
-function buildDetailTable(wrapId, keys, colNames, colData, colors) {
-  if (!keys.length) {
-    document.getElementById(wrapId).innerHTML = '<div class="empty"><div class="empty-icon" style="animation:float 2s ease-in-out infinite">🌿</div>尚無資料，快去新增吧！</div>';
-    return;
-  }
-
-  let html = '<div class="table-wrap"><table><thead><tr><th>月份</th>';
-  colNames.forEach((n,i) => html += `<th><span class="dot" style="background:${colors[i]}"></span>${n}</th>`);
-  html += '<th>合計</th>';
-  colNames.forEach((n,i) => html += `<th><span class="dot" style="background:${colors[i]}"></span>△${n}</th>`);
-  html += '<th>△合計</th></tr></thead><tbody>';
-
-  let grandTotals = colNames.map(() => 0);
-
-  keys.forEach((key, ri) => {
-    const vals = colData.map(arr => arr[ri]);
-    const total = vals.reduce((a,b) => a+b, 0);
-    grandTotals = grandTotals.map((g,i) => g + vals[i]);
-    const prevVals = ri > 0 ? colData.map(arr => arr[ri-1]) : null;
-    const prevTotal = prevVals ? prevVals.reduce((a,b)=>a+b,0) : null;
-    const [y, m] = key.split('-');
-    html += `<tr><td>${y}年${parseInt(m)}月</td>`;
-    vals.forEach(v => html += `<td>${fmtNum(v)}</td>`);
-    html += `<td><strong>${fmtNum(total)}</strong></td>`;
-    if (prevVals) {
-      vals.forEach((v,i) => {
-        const d = v - prevVals[i];
-        html += `<td class="${d>0?'delta-pos':d<0?'delta-neg':''}">${d>0?'+':''}${fmtNum(d)}</td>`;
-      });
-      const dt = total - prevTotal;
-      html += `<td class="${dt>0?'delta-pos':dt<0?'delta-neg':''} total-delta">${dt>0?'+':''}${fmtNum(dt)}</td>`;
-    } else {
-      colNames.forEach(() => html += '<td>–</td>');
-      html += '<td>–</td>';
+function onMonthChange(){selectedHistoryKey=document.getElementById('monthSelect').value||null;renderHistoryMonth();}
+function renderHistoryMonth(){
+    const c=document.getElementById('historyContent');
+    if(!selectedHistoryKey){c.innerHTML='';return;}
+    const[y,mo]=selectedHistoryKey.split('-');
+    const rs=getOrders().filter(r=>{const d=getOrderDate(r);return d.getFullYear()==y&&d.getMonth()==mo;});
+    const mKey=y+'-'+mo;
+    const manualEntry=getManualData()[mKey];
+    if(!rs.length && !manualEntry){c.innerHTML=`<div class="card"><div style="font-size:.82rem;color:var(--text-muted);text-align:center;padding:8px">本月暫無訂單</div></div>`;return;}
+    let tR=0,tP=0,tC=0,rP=0,tP2=0;
+    rs.forEach(r=>{tR+=r.rev;tP+=r.profit;tC+=r.cost;if(r.type==='retail')rP+=r.profit;else tP2+=r.profit;});
+    let html=`<div class="card"><div class="card-header">${y}年${parseInt(mo)+1}月 · 共${rs.length}筆</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px;">
+            <div class="stat-box"><span class="stat-label">營業額</span><div class="stat-value">$${tR.toLocaleString()}</div></div>
+            <div class="stat-box"><span class="stat-label">成本</span><div class="stat-value" style="color:var(--text-sub)">$${tC.toLocaleString()}</div></div>
+            <div class="stat-box"><span class="stat-label">淨利</span><div class="stat-value">$${tP.toLocaleString()}</div></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+            <div style="background:rgba(91,200,192,.1);border:1px solid rgba(91,200,192,.3);border-radius:10px;padding:12px;text-align:center;">
+                <div style="font-size:.67rem;color:#3A9E97;text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px">第一口袋 零售</div>
+                <div style="font-size:1rem;font-weight:600;color:#3A9E97">$${rP.toLocaleString()}</div>
+            </div>
+            <div style="background:rgba(59,110,222,.08);border:1px solid rgba(59,110,222,.2);border-radius:10px;padding:12px;text-align:center;">
+                <div style="font-size:.67rem;color:#2856C8;text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px">第二口袋 團隊</div>
+                <div style="font-size:1rem;font-weight:600;color:#2856C8">$${tP2.toLocaleString()}</div>
+            </div>
+        </div>
+    </div>`;
+    // Show manual entry if exists
+    if(manualEntry){
+        html+=`<div class="card" style="border:1.5px dashed var(--border);">
+            <div class="card-header" style="margin-bottom:8px;">手動輸入業績</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+                <div style="background:rgba(91,200,192,.1);border:1px solid rgba(91,200,192,.3);border-radius:10px;padding:11px;text-align:center;">
+                    <div style="font-size:.67rem;color:#3A9E97;text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px">第一口袋 零售</div>
+                    <div style="font-size:.95rem;font-weight:600;color:#3A9E97">$${manualEntry.retail.toLocaleString()}</div>
+                </div>
+                <div style="background:rgba(59,110,222,.08);border:1px solid rgba(59,110,222,.2);border-radius:10px;padding:11px;text-align:center;">
+                    <div style="font-size:.67rem;color:#2856C8;text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px">第二口袋 團隊</div>
+                    <div style="font-size:.95rem;font-weight:600;color:#2856C8">$${manualEntry.team.toLocaleString()}</div>
+                </div>
+            </div>
+        </div>`;
     }
-    html += '</tr>';
-  });
+    rs.sort((a,b)=>getOrderDate(b)-getOrderDate(a)).forEach(r=>{
+        const d=getOrderDate(r);
+        const ds=`${d.getMonth()+1}/${d.getDate()} ${d.toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'})}`;
+        const bl=buyers.find(b=>b.id===r.buyerType)?.name||r.type;
+        const tc=r.type==='retail'?'#3A9E97':'#2856C8',tb=r.type==='retail'?'rgba(91,200,192,.12)':'rgba(59,110,222,.1)';
+        html+=`<div class="order-card"><div class="order-card-header"><div><div class="order-note">${r.note}</div><div style="font-size:.72rem;color:var(--text-muted);margin-top:3px">${ds} <span style="background:${tb};color:${tc};font-size:.68rem;padding:2px 7px;border-radius:5px;font-weight:500">${bl}</span></div></div><div style="text-align:right;"><div class="order-profit">+$${r.profit.toLocaleString()}</div><div style="font-size:.71rem;color:var(--text-muted)">售$${r.rev.toLocaleString()}</div></div></div><div class="order-items">${r.items.map(i=>`${i.name} × ${i.qty}${i.unit}`).join(' · ')}</div><div class="order-actions"><button class="action-btn edit" onclick="openEditModal(${r.id})">✏ 編輯</button><button class="action-btn" onclick="deleteAndRefresh(${r.id})">刪除</button></div></div>`;
+    });
+    c.innerHTML=html;
+}
 
-  const grandTotal = grandTotals.reduce((a,b)=>a+b,0);
-  html += `<tr class="total-row"><td>累計</td>`;
-  grandTotals.forEach(g => html += `<td>${fmtNum(g)}</td>`);
-  html += `<td>${fmtNum(grandTotal)}</td>`;
-  colNames.forEach(() => html += '<td>–</td>');
-  html += `<td>–</td></tr>`;
-  html += '</tbody></table></div>';
 
-  document.getElementById(wrapId).innerHTML = html;
+function getManualData(){ return JSON.parse(localStorage.getItem('dct_manual_months'))||{}; }
+function saveManualDataStore(d){ localStorage.setItem('dct_manual_months',JSON.stringify(d)); }
+
+function initManualYearSelect(){
+    const sel=document.getElementById('manualYear');
+    if(!sel) return;
+    const curY=new Date().getFullYear();
+    sel.innerHTML='';
+    for(let y=curY;y>=curY-5;y--){
+        const o=document.createElement('option');
+        o.value=y; o.textContent=y+'年';
+        sel.appendChild(o);
+    }
+    // Set current month as default
+    document.getElementById('manualMonth').value=new Date().getMonth();
+}
+
+function saveManualEntry(){
+    const y=document.getElementById('manualYear').value;
+    const mo=document.getElementById('manualMonth').value;
+    const retail=parseInt(document.getElementById('manualRetail').value)||0;
+    const team=parseInt(document.getElementById('manualTeam').value)||0;
+    if(!y){ showToast('⚠ 請選擇年份','#C8748A'); return; }
+    const key=y+'-'+mo;
+    const d=getManualData();
+    if(retail===0&&team===0){ delete d[key]; } else { d[key]={retail,team}; }
+    saveManualDataStore(d);
+    document.getElementById('manualRetail').value='';
+    document.getElementById('manualTeam').value='';
+    renderChart();
+    loadHistory();
+    showToast('✓ 業績已儲存，圖表與歷史已更新', 'var(--rose)');
+}
+
+function editManualEntry(key){
+    const[y,mo]=key.split('-');
+    const d=getManualData()[key];
+    if(!d) return;
+    document.getElementById('manualYear').value=y;
+    document.getElementById('manualMonth').value=mo;
+    document.getElementById('manualRetail').value=d.retail||'';
+    document.getElementById('manualTeam').value=d.team||'';
+    // Scroll to input area
+    document.getElementById('manualYear').scrollIntoView({behavior:'smooth',block:'center'});
+}
+function deleteManualEntry(key){
+    const d=getManualData();
+    delete d[key];
+    saveManualDataStore(d);
+    renderChart(); loadHistory();
+}
+
+function renderManualList(){}
+
+
+function toggleChartEdit(key){
+    const id='edit_'+key.replace('-','_');
+    const el=document.getElementById(id);
+    if(!el) return;
+    el.style.display=el.style.display==='none'?'block':'none';
+}
+
+function saveChartEdit(key){
+    const id='edit_'+key.replace('-','_');
+    const retail=parseInt(document.getElementById(id+'_retail')?.value)||0;
+    const team=parseInt(document.getElementById(id+'_team')?.value)||0;
+    const d=getManualData();
+    if(retail===0&&team===0) delete d[key]; else d[key]={retail,team};
+    saveManualDataStore(d);
+    renderChart();
+    loadHistory();
+    showToast('✓ 已儲存，圖表已更新','var(--rose)');
+}
+
+// CHART
+function renderChart(){
+    const rs=getOrders();
+    const data={};
+    rs.forEach(r=>{const d=getOrderDate(r);const k=`${d.getFullYear()}-${d.getMonth()}`;if(!data[k])data[k]={retail:0,team:0};if(r.type==='retail')data[k].retail+=r.rev;else data[k].team+=r.rev;});
+    // Merge manual entries
+    const manualD=getManualData();
+    Object.keys(manualD).forEach(k=>{
+        if(!data[k])data[k]={retail:0,team:0};
+        data[k].retail+=manualD[k].retail||0;
+        data[k].team+=manualD[k].team||0;
+    });
+    const keys=Object.keys(data).sort();
+    if(!keys.length){document.getElementById('chartWrap').innerHTML='<div style="text-align:center;padding:20px;font-size:.82rem;color:var(--text-muted)">尚無數據，請先新增訂單</div>';document.getElementById('chartTable').innerHTML='';return;}
+    const BW=54,G=10,PL=54,PR=20,PT=50,PB=50,CH=260;
+    const aMax=Math.max(...keys.map(k=>data[k].retail+data[k].team),1);
+    const nM=Math.ceil(aMax/100000)*100000||100000;
+    const TW=PL+keys.length*(BW+G)+PR;
+    const ys=v=>PT+(CH*(1-v/nM));
+    let tks='';
+    for(let i=0;i<=5;i++){const v=nM*i/5,y=ys(v);tks+=`<line x1="${PL-6}" y1="${y}" x2="${TW-PR}" y2="${y}" stroke="#EDE7DE" stroke-width="1"/><text x="${PL-9}" y="${y+4}" text-anchor="end" font-size="9" fill="#B09EA8">${v>=10000?Math.round(v/1000)+'k':v}</text>`;}
+    let bars='';
+    keys.forEach((k,i)=>{
+        const d=data[k],[yr,mo]=k.split('-');
+        const x=PL+i*(BW+G),tot=d.retail+d.team;
+        const hr=CH*d.retail/nM,ht=CH*d.team/nM,yt=ys(tot),yr2=ys(d.retail);
+        if(d.team>0) bars+=`<rect x="${x}" y="${yt}" width="${BW}" height="${ht}" fill="#3B6EDE" rx="2"/>`;
+        if(d.retail>0) bars+=`<rect x="${x}" y="${yr2}" width="${BW}" height="${hr}" fill="#5BC8C0" rx="2"/>`;
+        if(tot>0) bars+=`<text x="${x+BW/2}" y="${yt-8}" text-anchor="middle" font-size="11" font-weight="600" fill="#2C2226">${tot>=1000?(tot/1000).toFixed(1).replace(/.0$/,'')+'k':tot}</text>`;
+        if(d.team>2000&&d.retail>0) bars+=`<text x="${x+BW/2}" y="${yt+ht/2+4}" text-anchor="middle" font-size="8" fill="white">${Math.round(d.team/1000)}k</text>`;
+        if(d.retail>2000&&d.team>0) bars+=`<text x="${x+BW/2}" y="${yr2+hr/2+4}" text-anchor="middle" font-size="8" fill="white">${Math.round(d.retail/1000)}k</text>`;
+        bars+=`<text x="${x+BW/2}" y="${PT+CH+18}" text-anchor="middle" font-size="9.5" fill="#7A6872">${parseInt(mo)+1}月</text>`;
+        if(i===0||mo==='0') bars+=`<text x="${x+BW/2}" y="${PT+CH+32}" text-anchor="middle" font-size="8" fill="#B09EA8">${yr}</text>`;
+    });
+    // Show profile on chart
+    const prof=getProfile();
+    const badge=document.getElementById('chartProfileBadge');
+    const profTxt=document.getElementById('chartProfileText');
+    if(prof.name||prof.level){
+        const parts=[prof.name,prof.level].filter(Boolean);
+        profTxt.innerText=parts.join(' · ');
+        badge.style.display='flex';
+    } else { badge.style.display='none'; }
+    document.getElementById('chartWrap').innerHTML=`<svg width="${TW}" height="${PT+CH+PB}" xmlns="http://www.w3.org/2000/svg" style="display:block;">${tks}<line x1="${PL}" y1="${PT}" x2="${PL}" y2="${PT+CH}" stroke="#EDE7DE" stroke-width="1.5"/>${bars}</svg>`;
+    let th='';
+    Object.keys(data).sort((a,b)=>b.localeCompare(a)).forEach(k=>{
+        const d=data[k],[yr,mo]=k.split('-'),tot=d.retail+d.team; // revenue
+        const mk='edit_'+k.replace('-','_');
+        const hasManual=!!manualD[k];
+        th+=`<div style="padding:12px 0;border-bottom:1px solid var(--beige-dark);">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+                <span style="font-size:.82rem;font-weight:600">${yr}年${parseInt(mo)+1}月 <span style="color:var(--rose);margin-left:4px">$${tot.toLocaleString()}</span>${hasManual?'<span style="font-size:.65rem;background:var(--rose-pale);color:var(--rose-deep);padding:2px 6px;border-radius:5px;margin-left:5px">含手動</span>':''}</span>
+                <button onclick="toggleChartEdit('${k}')" style="background:transparent;border:1px solid var(--border);border-radius:6px;padding:3px 9px;font-size:.7rem;color:var(--rose);cursor:pointer;font-family:inherit;">✏ 編輯</button>
+            </div>
+            <div style="display:flex;gap:14px;flex-wrap:wrap;margin-bottom:4px;">
+                <span style="font-size:.75rem"><span style="display:inline-block;width:8px;height:8px;background:#5BC8C0;border-radius:2px;margin-right:4px;vertical-align:middle"></span>零售 $${d.retail.toLocaleString()}</span>
+                <span style="font-size:.75rem"><span style="display:inline-block;width:8px;height:8px;background:#3B6EDE;border-radius:2px;margin-right:4px;vertical-align:middle"></span>團隊 $${d.team.toLocaleString()}</span>
+            </div>
+            <div id="${mk}" style="display:none;background:var(--rose-pale);border-radius:10px;padding:12px;margin-top:8px;">
+                <div style="font-size:.72rem;color:var(--rose-deep);margin-bottom:8px;font-weight:600;">修改手動輸入數字</div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">
+                    <div>
+                        <div style="font-size:.68rem;color:#3A9E97;margin-bottom:4px;text-transform:uppercase;letter-spacing:.8px;">零售淨利</div>
+                        <input type="number" id="${mk}_retail" class="custom-input" value="${(manualD[k]?.retail||0)}" style="border-left:3px solid #5BC8C0;padding:9px 10px;">
+                    </div>
+                    <div>
+                        <div style="font-size:.68rem;color:#2856C8;margin-bottom:4px;text-transform:uppercase;letter-spacing:.8px;">團隊淨利</div>
+                        <input type="number" id="${mk}_team" class="custom-input" value="${(manualD[k]?.team||0)}" style="border-left:3px solid #3B6EDE;padding:9px 10px;">
+                    </div>
+                </div>
+                <div style="display:flex;gap:8px;">
+                    <button onclick="saveChartEdit('${k}')" style="flex:1;padding:10px;background:var(--rose);color:white;border:none;border-radius:8px;font-size:.82rem;cursor:pointer;font-family:inherit;">儲存</button>
+                    <button onclick="toggleChartEdit('${k}')" style="padding:10px 14px;background:var(--beige);color:var(--text-sub);border:1px solid var(--border);border-radius:8px;font-size:.82rem;cursor:pointer;font-family:inherit;">取消</button>
+                </div>
+            </div>
+        </div>`;
+    });
+    document.getElementById('chartTable').innerHTML=th||'<span style="font-size:.81rem;color:var(--text-muted)">無數據</span>';
+}
+
+// EDIT MODAL
+function openEditModal(id){
+    const order=getOrders().find(r=>r.id===id);
+    if(!order) return;
+    editingOrderId=id;editCart={};
+    editBuyerType=order.buyerType||'retail';
+    order.items.forEach(i=>{editCart[i.name]=i.qty;});
+    const d=getOrderDate(order);
+    document.getElementById('editModalTitle').innerText=`編輯訂單 · ${d.getMonth()+1}/${d.getDate()}`;
+    renderEditModal(order);
+    document.getElementById('editModal').classList.add('open');
+}
+function renderEditModal(order){
+    const sl=order.sellerLevel||'L3_sup',bt=editBuyerType||order.buyerType||'retail';
+    const slN=levels.find(l=>l.id===sl)?.name||sl,btN=buyers.find(b=>b.id===bt)?.name||bt;
+    const d=getOrderDate(order);
+    // Build all products in editCart (original + any added)
+    const allNames=[...new Set([...order.items.map(i=>i.name),...Object.keys(editCart)])];
+    let iH='';
+    allNames.forEach(n=>{
+        const q=editCart[n]||0; if(q===0&&!order.items.find(i=>i.name===n)) return;
+        const cp=products[n]?products[n][sl]:0,sp=products[n]?products[n][bt]:0;
+        iH+=`<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--beige-dark);">
+            <div style="flex:1;min-width:0;">
+                <div style="font-size:.83rem;font-weight:500;color:var(--text-main)">${n}</div>
+                <div style="font-size:.7rem;color:var(--text-muted);margin-top:2px">售$${sp.toLocaleString()} 利$${(sp-cp).toLocaleString()}</div>
+            </div>
+            <div class="qty-control">
+                <button class="btn-qty" onclick="changeEditQty('${n}',-1)">−</button>
+                <div id="eq_${n.replace(/[^a-zA-Z0-9]/g,'_')}" class="qty-input">${q}</div>
+                <button class="btn-qty" onclick="changeEditQty('${n}',1)">+</button>
+            </div>
+        </div>`;
+    });
+    // Product picker options
+    const catOpts=['活動','纖體','美肌','保健'].map(cat=>{
+        const opts=Object.keys(products).filter(n=>products[n].cat===cat).map(n=>`<option value="${n}">${n} (售$${products[n][bt].toLocaleString()})</option>`).join('');
+        return `<optgroup label="── ${cat} ──">${opts}</optgroup>`;
+    }).join('');
+    let rev=0,cost=0;
+    allNames.forEach(n=>{const q=editCart[n]||0;if(products[n]){rev+=products[n][bt]*q;cost+=products[n][sl]*q;}});
+    const extra=order.extraCost||0;
+    document.getElementById('editModalContent').innerHTML=`
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;">
+            <div style="background:var(--rose-pale);border-radius:10px;padding:8px 12px;text-align:center;">
+                <div style="font-size:.66rem;color:var(--text-muted);margin-bottom:2px">進貨等級</div>
+                <div style="font-size:.82rem;font-weight:500;color:var(--rose-deep)">${slN}</div>
+            </div>
+            <div style="position:relative;">
+                <select id="editBuyerSelect" class="month-select" style="font-size:.8rem;padding:8px 28px 8px 10px;border-color:var(--rose-light);" onchange="editBuyerType=this.value;renderEditModal(getOrders().find(r=>r.id===editingOrderId));">
+                    ${buyers.map(b=>'<option value="'+b.id+'"'+(b.id===editBuyerType?' selected':'')+'>'+b.name+'</option>').join('')}
+                </select>
+                <span style="position:absolute;right:8px;top:50%;transform:translateY(-50%);color:var(--rose);pointer-events:none;font-size:.8rem;">▾</span>
+            </div>
+        </div>
+        <div class="input-group"><span class="input-label">訂單日期</span><input type="datetime-local" id="editDate" class="custom-input" value="${toLocalISO(d)}" style="color:var(--rose-deep);"></div>
+        <div class="input-group"><span class="input-label">客戶備註</span><input type="text" id="editNote" class="custom-input" value="${order.note||''}"></div>
+        <div class="input-group"><span class="input-label">額外成本</span><input type="number" id="editExtra" class="custom-input cost-input" value="${order.extraCost||0}" oninput="refreshEditTotal()"></div>
+        <div class="card-header" style="margin:12px 0 8px;">購買品項</div>
+        <div id="editItemList" style="margin-bottom:10px;">${iH}</div>
+        <div style="background:var(--beige);border-radius:12px;padding:12px;margin-bottom:12px;">
+            <div style="font-size:.72rem;font-weight:600;color:var(--text-sub);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px;">新增品項</div>
+            <div style="position:relative;margin-bottom:8px;">
+                <select id="addProductSelect" class="month-select" style="font-size:.82rem;padding:10px 32px 10px 12px;">
+                    <option value="">— 選擇商品 —</option>${catOpts}
+                </select>
+                <span style="position:absolute;right:12px;top:50%;transform:translateY(-50%);color:var(--rose);pointer-events:none;font-size:.85rem;">▾</span>
+            </div>
+            <button onclick="addProductToEdit()" class="save-btn" style="margin-top:0;padding:11px;font-size:.82rem;background:var(--rose);">＋ 加入訂單</button>
+        </div>
+        <div id="editTotal" style="background:var(--rose-pale);border-radius:12px;padding:14px;text-align:center;margin-bottom:4px;">
+            <div style="font-size:.73rem;color:var(--rose-deep);margin-bottom:4px;">預估淨利</div>
+            <div style="font-size:1.6rem;font-weight:600;color:var(--rose)">$${(rev-cost-extra).toLocaleString()}</div>
+            <div style="font-size:.72rem;color:var(--text-muted);margin-top:4px;">售$${rev.toLocaleString()} 成本$${(cost+extra).toLocaleString()}</div>
+        </div>
+        <div class="modal-actions"><button class="btn-secondary" onclick="closeEditModal()">取消</button><button class="btn-danger" onclick="deleteAndRefresh(${order.id});closeEditModal()">刪除</button><button class="btn-primary" onclick="saveEditOrder()">儲存</button></div>`;
+}
+function addProductToEdit(){
+    const sel=document.getElementById('addProductSelect');
+    const n=sel.value; if(!n) return;
+    editCart[n]=(editCart[n]||0)+1;
+    // Re-render modal items
+    const order=getOrders().find(r=>r.id===editingOrderId);
+    if(order) renderEditModal(order);
+}
+function changeEditQty(n,d){
+    editCart[n]=Math.max(0,(editCart[n]||0)+d);
+    const el=document.getElementById('eq_'+n.replace(/[^a-zA-Z0-9]/g,'_'));
+    if(el)el.innerText=editCart[n];
+    refreshEditTotal();
+}
+function refreshEditTotal(){
+    const order=getOrders().find(r=>r.id===editingOrderId);if(!order)return;
+    const sl=order.sellerLevel||'L2',bt=order.buyerType||'retail';
+    let rev=0,cost=0;
+    order.items.forEach(i=>{const q=editCart[i.name]||0;if(products[i.name]){rev+=products[i.name][bt]*q;cost+=products[i.name][sl]*q;}});
+    const extra=parseInt(document.getElementById('editExtra')?.value)||0;
+    const el=document.getElementById('editTotal');
+    if(el)el.innerHTML=`<div style="font-size:.73rem;color:var(--rose-deep);margin-bottom:4px;">預估淨利</div><div style="font-size:1.6rem;font-weight:600;color:var(--rose)">$${(rev-cost-extra).toLocaleString()}</div><div style="font-size:.72rem;color:var(--text-muted);margin-top:4px;">售$${rev.toLocaleString()} 成本$${(cost+extra).toLocaleString()}</div>`;
+}
+function saveEditOrder(){
+    const rs=getOrders();const idx=rs.findIndex(r=>r.id===editingOrderId);if(idx<0)return;
+    const order=rs[idx];const sl=order.sellerLevel||'L3_sup',bt=editBuyerType||order.buyerType||'retail';
+    const extra=parseInt(document.getElementById('editExtra')?.value)||0;
+    const dateVal=document.getElementById('editDate')?.value;
+    const newTs=dateVal?new Date(dateVal).getTime():order.orderDate||order.id;
+    const nd=new Date(newTs);
+    let rev=0,cost=0,items=[];
+    order.items.forEach(i=>{const q=editCart[i.name]||0;if(q>0){items.push({...i,qty:q});if(products[i.name]){rev+=products[i.name][bt]*q;cost+=products[i.name][sl]*q;}}});
+    if(!items.length){showToast('⚠ 請保留至少一項商品','#C8748A');return;}
+    rs[idx]={...order,orderDate:newTs,year:nd.getFullYear(),month:nd.getMonth(),buyerType:bt,type:buyers.find(b=>b.id===bt)?.t||order.type,note:document.getElementById('editNote').value||'無備註',extraCost:extra,itemsCost:cost,cost:cost+extra,rev,profit:rev-cost-extra,items};
+    saveOrders(rs);closeEditModal();loadHistory();loadDashboards();renderChart();
+    showToast('✓ 訂單已更新', 'var(--rose)');
+}
+function closeEditModal(e){if(e&&e.target!==document.getElementById('editModal'))return;document.getElementById('editModal').classList.remove('open');editingOrderId=null;editCart={};}
+// SEARCH
+function onSearchInput(){
+    const q=document.getElementById('historySearch').value.trim();
+    const sr=document.getElementById('searchResults');
+    const mc=document.getElementById('monthPickerCard');
+    const hc=document.getElementById('historyContent');
+    if(!q){ sr.style.display='none'; mc.style.display=''; hc.style.display=''; return; }
+    mc.style.display='none'; hc.style.display='none'; sr.style.display='block';
+    const all=getOrders().filter(r=>(r.note||'').toLowerCase().includes(q.toLowerCase()));
+    if(!all.length){ sr.innerHTML='<div style="text-align:center;font-size:.82rem;color:var(--text-muted);padding:12px">找不到符合的備註</div>'; return; }
+    all.sort((a,b)=>getOrderDate(b)-getOrderDate(a));
+    let html=`<div style="font-size:.75rem;color:var(--text-muted);margin-bottom:10px">共找到 ${all.length} 筆含「${q}」的訂單</div>`;
+    all.forEach(r=>{
+        const d=getOrderDate(r);
+        const ds=`${d.getFullYear()}/${d.getMonth()+1}/${d.getDate()} ${d.toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'})}`;
+        const bl=buyers.find(b=>b.id===r.buyerType)?.name||r.type;
+        const tc=r.type==='retail'?'#3A9E97':'#2856C8',tb=r.type==='retail'?'rgba(91,200,192,.12)':'rgba(59,110,222,.1)';
+        // Highlight matching text in note
+        const regex=new RegExp('('+q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','gi');
+        const hiNote=(r.note||'').replace(regex,'<mark style="background:#FFE8C0;border-radius:3px;padding:0 2px">$1</mark>');
+        html+=`<div class="order-card"><div class="order-card-header"><div><div class="order-note">${hiNote}</div><div style="font-size:.72rem;color:var(--text-muted);margin-top:3px">${ds} <span style="background:${tb};color:${tc};font-size:.68rem;padding:2px 7px;border-radius:5px;font-weight:500">${bl}</span></div></div><div style="text-align:right;"><div class="order-profit">+$${r.profit.toLocaleString()}</div><div style="font-size:.71rem;color:var(--text-muted)">售$${r.rev.toLocaleString()}</div></div></div><div class="order-items">${r.items.map(i=>`${i.name} × ${i.qty}${i.unit}`).join(' · ')}</div><div class="order-actions"><button class="action-btn edit" onclick="openEditModal(${r.id})">✏ 編輯</button><button class="action-btn" onclick="deleteAndRefresh(${r.id})">刪除</button></div></div>`;
+    });
+    sr.innerHTML=html;
+}
+
+function deleteAndRefresh(id){saveOrders(getOrders().filter(r=>r.id!==id));loadHistory();loadDashboards();renderChart();showToast('已刪除訂單','#7A6872');}
+
+// roundRect polyfill for older Safari
+if (!CanvasRenderingContext2D.prototype.roundRect) {
+    CanvasRenderingContext2D.prototype.roundRect = function(x,y,w,h,r){
+        this.beginPath();
+        this.moveTo(x+r,y); this.lineTo(x+w-r,y);
+        this.quadraticCurveTo(x+w,y,x+w,y+r); this.lineTo(x+w,y+h-r);
+        this.quadraticCurveTo(x+w,y+h,x+w-r,y+h); this.lineTo(x+r,y+h);
+        this.quadraticCurveTo(x,y+h,x,y+h-r); this.lineTo(x,y+r);
+        this.quadraticCurveTo(x,y,x+r,y); this.closePath();
+    };
 }
 
 // ══════════════════════════════════════════
-//  REFRESH ALL
+//  魔術曲線圖 JS
 // ══════════════════════════════════════════
-function refreshAll() {
-  renderSummaryTable();
-  renderCharts();
+const CURVE_STORAGE = 'dct_monthly_data_v1';
+const CURVE_CONFIG  = 'dct_curve_config_v1';
+let curveDB  = JSON.parse(localStorage.getItem(CURVE_STORAGE) || '{}');
+let curveCfg = JSON.parse(localStorage.getItem(CURVE_CONFIG)  || '{}');
+let curveCharts = {};
+
+function saveCurveDB(){ localStorage.setItem(CURVE_STORAGE, JSON.stringify(curveDB)); }
+function saveCurveConfig(){
+    curveCfg.years = document.getElementById('cfg-years')?.value?.trim()||'';
+    localStorage.setItem(CURVE_CONFIG, JSON.stringify(curveCfg));
+    updateCurveTitles();
 }
 
-// ══════════════════════════════════════════
-//  INLINE EDITABLE TABLE
-// ══════════════════════════════════════════
-function renderSummaryTable() {
-  const keys = getSortedKeys().slice().reverse();
-  const wrap = document.getElementById('summary-table-wrap');
-  if (!keys.length) {
-    wrap.innerHTML = '<div class="empty"><div class="empty-icon" style="animation:float 2s ease-in-out infinite">🌱</div>還沒有資料喔～<br>用上方「新增月份」開始記錄吧！🌸</div>';
-    return;
-  }
-
-  const fields = [
-    { key:'retail', label:'零售',   color:'#7ecfda' },
-    { key:'team',   label:'團隊',   color:'#1f6feb' },
-    { key:'rebate', label:'返利',   color:'#8b5cf6' },
-    { key:'tiktok', label:'TikTok', color:'#5bc4d0' },
-    { key:'ig',     label:'IG',     color:'#1e5fcc' },
-  ];
-
-  let html = `<table><thead><tr>
-    <th>月份</th>
-    ${fields.map(f=>`<th><span class="dot" style="background:${f.color}"></span>${f.label}</th>`).join('')}
-    <th></th>
-  </tr></thead><tbody>`;
-
-  keys.forEach(key => {
-    const d = db[key];
-    const [y, m] = key.split('-');
-    html += `<tr>
-      <td style="white-space:nowrap;font-weight:600;color:var(--teal)">${y}/${parseInt(m)}</td>
-      ${fields.map(f => `<td><input class="cell-input" type="number" value="${d[f.key]||0}" min="0"
-        onchange="updateCell('${key}','${f.key}',this.value)"
-        onfocus="this.select()"></td>`).join('')}
-      <td><button class="btn btn-danger btn-sm" onclick="deleteRow('${key}')">🗑</button></td>
-    </tr>`;
-  });
-
-  html += '</tbody></table>';
-  wrap.innerHTML = html;
+function updateCurveTitles(){
+    const p = getProfile();
+    const name   = p.name||'';
+    const level  = p.level ? ' ｜ ' + p.level : '';
+    const upline = p.upline ? ' ｜ 上家：' + p.upline : '';
+    const years  = (localStorage.getItem(CURVE_CONFIG) ? JSON.parse(localStorage.getItem(CURVE_CONFIG)).years : '')||'';
+    const t1 = document.getElementById('curve-chart1-title');
+    const t2 = document.getElementById('curve-chart2-title');
+    const s1 = document.getElementById('curve-chart1-sub');
+    const s2 = document.getElementById('curve-chart2-sub');
+    if(t1) t1.textContent = [years, name, '淨利'].filter(Boolean).join(' ') || '淨利曲線圖';
+    if(t2) t2.textContent = [years, name, '粉絲'].filter(Boolean).join(' ') || '粉絲曲線圖';
+    if(s1) s1.textContent = '三口袋月度淨利' + level + upline;
+    if(s2) s2.textContent = 'TikTok + IG 月度粉絲' + level + upline;
 }
 
-function updateCell(key, field, value) {
-  if (!db[key]) return;
-  db[key][field] = parseInt(value) || 0;
-  saveDB();
-  renderCharts();
-  showToast('✅ 已自動儲存 🎉');
+function getCurveSortedKeys(){ return Object.keys(curveDB).sort(); }
+
+function initCurve(){
+    const yr = document.getElementById('curve-year');
+    if(!yr.options.length){
+        const cy = new Date().getFullYear();
+        for(let y=2022;y<=cy+2;y++){
+            const o=document.createElement('option');
+            o.value=y; o.textContent=y+'年';
+            if(y===cy) o.selected=true;
+            yr.appendChild(o);
+        }
+        document.getElementById('curve-month').value = new Date().getMonth()+1;
+    }
+    const cfg2 = JSON.parse(localStorage.getItem(CURVE_CONFIG)||'{}');
+    const yEl = document.getElementById('cfg-years');
+    if(yEl) yEl.value = cfg2.years||'';
+    updateCurveTitles();
+    renderCurveTable();
+    renderCurveCharts();
 }
 
-function deleteRow(key) {
-  const [y,m] = key.split('-');
-  if (!confirm(y + '年' + parseInt(m) + '月 確定刪除？')) return;
-  delete db[key];
-  saveDB();
-  refreshAll();
-  showToast('🗑 已刪除');
+function switchCurve(panelId, el){
+    document.querySelectorAll('.curve-sub-tab').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.curve-panel').forEach(p=>p.classList.remove('active'));
+    el.classList.add('active');
+    document.getElementById(panelId).classList.add('active');
+    if(panelId!=='curve-input') renderCurveCharts();
 }
 
-// ══════════════════════════════════════════
-//  EXPORT / IMPORT
-// ══════════════════════════════════════════
-function exportData() {
-  const blob = new Blob([JSON.stringify(db, null, 2)], { type: 'application/json' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = '惠誼月報表_' + new Date().toISOString().slice(0,10) + '.json';
-  a.click();
-  showToast('📤 已匯出資料');
+function addCurveMonth(){
+    const y = document.getElementById('curve-year').value;
+    const m = document.getElementById('curve-month').value;
+    const key = y + '-' + String(m).padStart(2,'0');
+    if(curveDB[key]){ showToast('此月份已存在，請直接在表格修改'); return; }
+    curveDB[key] = {
+        retail: parseInt(document.getElementById('cv-retail').value)||0,
+        team:   parseInt(document.getElementById('cv-team').value)||0,
+        rebate: parseInt(document.getElementById('cv-rebate').value)||0,
+        tiktok: parseInt(document.getElementById('cv-tiktok').value)||0,
+        ig:     parseInt(document.getElementById('cv-ig').value)||0,
+    };
+    saveCurveDB();
+    ['cv-retail','cv-team','cv-rebate','cv-tiktok','cv-ig'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+    renderCurveTable();
+    renderCurveCharts();
+    showToast('✓ 已新增 ' + y + '年' + parseInt(m) + '月');
 }
 
-function importData(e) {
-  const file = e.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = ev => {
-    try {
-      const imported = JSON.parse(ev.target.result);
-      if (confirm('確定匯入？將合併現有資料。')) {
-        db = { ...db, ...imported };
-        saveDB();
-        refreshAll();
-        showToast('📥 匯入成功：' + Object.keys(imported).length + ' 筆');
-      }
-    } catch { showToast('⚠️ 檔案格式錯誤'); }
-  };
-  reader.readAsText(file);
-  e.target.value = '';
+function renderCurveTable(){
+    const wrap = document.getElementById('curve-edit-table');
+    if(!wrap) return;
+    const keys = getCurveSortedKeys().slice().reverse();
+    if(!keys.length){ wrap.innerHTML='<div style="text-align:center;padding:20px;font-size:.82rem;color:var(--text-muted)">尚未新增任何資料</div>'; return; }
+    const fields=[
+        {key:'retail',label:'零售',color:'#5BC8C0'},
+        {key:'team',label:'團隊',color:'#3B6EDE'},
+        {key:'rebate',label:'返利',color:'#9B82D4'},
+        {key:'tiktok',label:'TikTok',color:'#5BC8C0'},
+        {key:'ig',label:'IG',color:'var(--rose)'},
+    ];
+    let html='<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:.74rem"><thead><tr><th style="background:var(--beige);padding:7px 8px;text-align:left;border-bottom:2px solid var(--border)">月份</th>';
+    fields.forEach(f=>html+=`<th style="background:var(--beige);padding:7px 8px;text-align:right;border-bottom:2px solid var(--border)"><span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:${f.color};margin-right:3px;vertical-align:middle"></span>${f.label}</th>`);
+    html+='<th style="background:var(--beige);padding:7px 8px;border-bottom:2px solid var(--border)"></th></tr></thead><tbody>';
+    keys.forEach(key=>{
+        const d=curveDB[key]; const[y,m]=key.split('-');
+        html+=`<tr><td style="padding:6px 8px;border-bottom:1px solid var(--beige-dark);font-weight:600;color:var(--rose-deep)">${y}/${parseInt(m)}</td>`;
+        fields.forEach(f=>html+=`<td style="padding:6px 8px;border-bottom:1px solid var(--beige-dark)"><input class="cell-input-curve" type="number" value="${d[f.key]||0}" min="0" onchange="updateCurveCell('${key}','${f.key}',this.value)" onfocus="this.select()"></td>`);
+        html+=`<td style="padding:6px 8px;border-bottom:1px solid var(--beige-dark)"><button class="action-btn" onclick="deleteCurveRow('${key}')" style="font-size:.7rem;padding:3px 8px;">刪除</button></td></tr>`;
+    });
+    html+='</tbody></table></div>';
+    wrap.innerHTML=html;
 }
 
-// ══════════════════════════════════════════
-//  TOAST
-// ══════════════════════════════════════════
-let toastTimer;
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => t.classList.remove('show'), 2400);
+function updateCurveCell(key,field,val){
+    if(!curveDB[key]) return;
+    curveDB[key][field]=parseInt(val)||0;
+    saveCurveDB();
+    renderCurveCharts();
+    showToast('✓ 已儲存');
+}
+function deleteCurveRow(key){
+    const[y,m]=key.split('-');
+    if(!confirm(y+'年'+parseInt(m)+'月 確定刪除？')) return;
+    delete curveDB[key];
+    saveCurveDB();
+    renderCurveTable();
+    renderCurveCharts();
+    showToast('已刪除');
 }
 
-// ══════════════════════════════════════════
-//  START
-// ══════════════════════════════════════════
-init();
+function fmtCK(n){
+    if(n>=1000000) return (n/1000000).toFixed(1)+'M';
+    if(n>=10000) return (n/10000).toFixed(0)+'w';
+    if(n>=1000) return (n/1000).toFixed(1)+'k';
+    return String(n);
+}
+
+function clearCurveChart(id){
+    if(curveCharts[id]){ curveCharts[id].destroy(); delete curveCharts[id]; }
+}
+
+function buildCurveChart(id, labels, datasets, deltaArr){
+    clearCurveChart(id);
+    const el=document.getElementById(id);
+    if(!el) return;
+
+    // Disable built-in datalabels
+    datasets.forEach(ds=>{ ds.datalabels={display:false}; });
+
+    const customPlugin = {
+        id: 'curveLabels_'+id,
+        afterDraw(chart){
+            const ctx=chart.ctx;
+            const nDS=chart.data.datasets.length;
+            // Segment labels
+            chart.data.datasets.forEach((ds,di)=>{
+                const meta=chart.getDatasetMeta(di);
+                meta.data.forEach((bar,bi)=>{
+                    const v=ds.data[bi]; if(!v) return;
+                    const segH=Math.abs(bar.base-bar.y); if(segH<16) return;
+                    const cx=bar.x, cy=(bar.y+bar.base)/2;
+                    const lbl=fmtCK(v);
+                    ctx.font='bold 9px "Noto Sans TC",sans-serif';
+                    const tw=ctx.measureText(lbl).width;
+                    const pad=3,rh=13,rw=tw+pad*2;
+                    ctx.fillStyle='rgba(0,0,0,.42)';
+                    ctx.beginPath(); ctx.roundRect(cx-rw/2,cy-rh/2,rw,rh,2); ctx.fill();
+                    ctx.fillStyle='#FFE566'; ctx.textAlign='center'; ctx.textBaseline='middle';
+                    ctx.fillText(lbl,cx,cy);
+                });
+            });
+            // Totals above bars
+            const topMeta=chart.getDatasetMeta(nDS-1);
+            topMeta.data.forEach((bar,bi)=>{
+                const tot=datasets.reduce((s,ds)=>s+(ds.data[bi]||0),0); if(!tot) return;
+                const cx=bar.x; let topY=bar.y-5;
+                if(deltaArr){
+                    const d=deltaArr[bi];
+                    if(d!==null&&d!==undefined){
+                        const dl=(d>=0?'+':'')+fmtCK(d);
+                        ctx.font='bold 9px "Noto Sans TC",sans-serif';
+                        ctx.fillStyle=d>=0?'#3A9E97':'#e05050';
+                        ctx.textAlign='center'; ctx.textBaseline='bottom';
+                        ctx.fillText(dl,cx,topY-1); topY-=12;
+                    }
+                }
+                const tl=fmtCK(tot);
+                ctx.font='bold 10px "Noto Sans TC",sans-serif';
+                const tw=ctx.measureText(tl).width;
+                const pad=4,rh=14,rw=tw+pad*2;
+                ctx.fillStyle='rgba(44,34,38,.72)';
+                ctx.beginPath(); ctx.roundRect(cx-rw/2,topY-rh,rw,rh,3); ctx.fill();
+                ctx.fillStyle='#fff'; ctx.textAlign='center'; ctx.textBaseline='bottom';
+                ctx.fillText(tl,cx,topY-1);
+            });
+        }
+    };
+
+    const ctx2=el.getContext('2d');
+    curveCharts[id]=new Chart(ctx2,{
+        type:'bar',
+        data:{labels,datasets},
+        options:{
+            plugins:{legend:{display:false},datalabels:{display:false},
+                tooltip:{backgroundColor:'#fff8f4',titleColor:'#2C2226',bodyColor:'#7A6872',borderColor:'#E8DDE3',borderWidth:1,padding:10,
+                    callbacks:{label:c=>' '+c.dataset.label+': '+Number(c.parsed.y).toLocaleString('zh-TW')}}
+            },
+            scales:{
+                x:{stacked:true,ticks:{color:'#B09EA8',font:{size:10}},grid:{display:false}},
+                y:{stacked:true,ticks:{color:'#B09EA8',font:{size:10},callback:v=>fmtCK(v)},grid:{color:'rgba(232,221,227,.6)'}}
+            },
+            layout:{padding:{top:deltaArr?52:36}},
+            responsive:true,maintainAspectRatio:false,animation:{duration:500}
+        },
+        plugins:[ChartDataLabels, customPlugin]
+    });
+}
+
+function buildCurveDetailTable(wrapId, keys, colNames, colData, colors){
+    const wrap=document.getElementById(wrapId); if(!wrap) return;
+    if(!keys.length){ wrap.innerHTML='<div style="text-align:center;padding:16px;font-size:.8rem;color:var(--text-muted)">尚無資料</div>'; return; }
+    let html='<div class="curve-table-wrap"><table><thead><tr><th>月份</th>';
+    colNames.forEach((n,i)=>html+=`<th><span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:${colors[i]};margin-right:3px;vertical-align:middle"></span>${n}</th>`);
+    html+='<th>合計</th>';
+    colNames.forEach((n,i)=>html+=`<th>△${n}</th>`);
+    html+='<th>△合計</th></tr></thead><tbody>';
+    let grand=colNames.map(()=>0);
+    keys.forEach((key,ri)=>{
+        const vals=colData.map(a=>a[ri]);
+        const tot=vals.reduce((a,b)=>a+b,0);
+        grand=grand.map((g,i)=>g+vals[i]);
+        const prev=ri>0?colData.map(a=>a[ri-1]):null;
+        const prevTot=prev?prev.reduce((a,b)=>a+b,0):null;
+        const[y,m]=key.split('-');
+        html+=`<tr><td>${y}/${parseInt(m)}</td>`;
+        vals.forEach(v=>html+=`<td>${Number(v).toLocaleString('zh-TW')}</td>`);
+        html+=`<td><strong>${Number(tot).toLocaleString('zh-TW')}</strong></td>`;
+        if(prev){
+            vals.forEach((v,i)=>{ const d=v-prev[i]; html+=`<td class="${d>0?'delta-pos':d<0?'delta-neg':''}">${d>0?'+':''}${Number(d).toLocaleString('zh-TW')}</td>`; });
+            const dt=tot-prevTot;
+            html+=`<td class="${dt>0?'delta-pos':dt<0?'delta-neg':''}">${dt>0?'+':''}${Number(dt).toLocaleString('zh-TW')}</td>`;
+        } else { colNames.forEach(()=>html+='<td>–</td>'); html+='<td>–</td>'; }
+        html+='</tr>';
+    });
+    const grandTot=grand.reduce((a,b)=>a+b,0);
+    html+=`<tr><td>累計</td>`;
+    grand.forEach(g=>html+=`<td>${Number(g).toLocaleString('zh-TW')}</td>`);
+    html+=`<td>${Number(grandTot).toLocaleString('zh-TW')}</td>`;
+    colNames.forEach(()=>html+='<td>–</td>'); html+='<td>–</td></tr></tbody></table></div>';
+    wrap.innerHTML=html;
+}
+
+function renderCurveCharts(){
+    const keys=getCurveSortedKeys();
+    if(!keys.length){
+        ['curve-chart1','curve-chart2'].forEach(clearCurveChart);
+        ['curve-table1','curve-table2','curve-stats1','curve-stats2'].forEach(id=>{ const el=document.getElementById(id); if(el) el.innerHTML=''; });
+        return;
+    }
+    const labels=keys.map(k=>{ const[y,m]=k.split('-'); return parseInt(m)+'月'; });
+    const retail=keys.map(k=>curveDB[k].retail||0);
+    const team=keys.map(k=>curveDB[k].team||0);
+    const rebate=keys.map(k=>curveDB[k].rebate||0);
+    const tiktok=keys.map(k=>curveDB[k].tiktok||0);
+    const ig=keys.map(k=>curveDB[k].ig||0);
+
+    buildCurveChart('curve-chart1',labels,[
+        {label:'第一口袋 零售',data:retail,backgroundColor:'#5BC8C0',borderWidth:0},
+        {label:'第二口袋 團隊',data:team,backgroundColor:'#3B6EDE',borderWidth:0},
+        {label:'第三口袋 返利',data:rebate,backgroundColor:'#9B82D4',borderWidth:0},
+    ]);
+    buildCurveDetailTable('curve-table1',keys,['零售','團隊','返利'],[retail,team,rebate],['#5BC8C0','#3B6EDE','#9B82D4']);
+
+    const totF=tiktok.map((t,i)=>t+ig[i]);
+    const dF=totF.map((v,i)=>i===0?null:v-totF[i-1]);
+    buildCurveChart('curve-chart2',labels,[
+        {label:'TikTok',data:tiktok,backgroundColor:'#5BC8C0',borderWidth:0},
+        {label:'IG',data:ig,backgroundColor:'var(--rose)',borderWidth:0},
+    ],dF);
+    buildCurveDetailTable('curve-table2',keys,['TikTok','IG'],[tiktok,ig],['#5BC8C0','#C8748A']);
+
+    // Stats
+    const fmtN=n=>Number(n).toLocaleString('zh-TW');
+    const dStr=(cur,prev)=>{ if(prev===null||prev===undefined) return ''; const d=cur-prev; return (d>0?'+':'')+fmtN(d); };
+    const s1=document.getElementById('curve-stats1');
+    const s2=document.getElementById('curve-stats2');
+    if(s1) s1.innerHTML=[
+        {l:'最新月總淨利',v:fmtN(retail.at(-1)+team.at(-1)+rebate.at(-1)),s:dStr(retail.at(-1)+team.at(-1)+rebate.at(-1),keys.length>1?retail.at(-2)+team.at(-2)+rebate.at(-2):null)},
+        {l:'累計總淨利',v:fmtN([...retail,...team,...rebate].reduce((a,b)=>a+b,0))},
+    ].map(x=>`<div class="curve-stat"><div class="cs-label">${x.l}</div><div class="cs-val">${x.v}</div>${x.s?`<div class="cs-sub ${x.s.startsWith('+')?'delta-pos':x.s.startsWith('-')?'delta-neg':''}">${x.s}</div>`:''}</div>`).join('');
+    if(s2) s2.innerHTML=[
+        {l:'最新月總粉絲',v:fmtN(totF.at(-1)),s:dStr(totF.at(-1),keys.length>1?totF.at(-2):null)},
+        {l:'TikTok',v:fmtN(tiktok.at(-1)),s:dStr(tiktok.at(-1),keys.length>1?tiktok.at(-2):null)},
+        {l:'IG',v:fmtN(ig.at(-1)),s:dStr(ig.at(-1),keys.length>1?ig.at(-2):null)},
+    ].map(x=>`<div class="curve-stat"><div class="cs-label">${x.l}</div><div class="cs-val">${x.v}</div>${x.s?`<div class="cs-sub ${x.s.startsWith('+')?'delta-pos':x.s.startsWith('-')?'delta-neg':''}">${x.s}</div>`:''}</div>`).join('');
+    updateCurveTitles();
+}
+
 </script>
 </body>
 </html>
