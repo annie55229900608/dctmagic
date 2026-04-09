@@ -634,6 +634,7 @@ function switchTab(id,el){
     if(id==='tab-daily'||id==='tab-monthly') loadDashboards();
     if(id==='tab-history') loadHistory();
     if(id==='tab-chart'){ renderChart(); initManualYearSelect(); }
+    if(id==='tab-curve'){ initCurve(); }
 }
 function switchCat(cat,el){currentCat=cat;document.querySelectorAll('.cat-tab').forEach(t=>t.classList.remove('active'));el.classList.add('active');renderProducts();}
 function updateGoal(v){localStorage.setItem('dct_goal',v);loadDashboards();}
@@ -1132,6 +1133,14 @@ function updateCurveTitles(){
     if(t2) t2.textContent = [years, name, '粉絲'].filter(Boolean).join(' ') || '粉絲曲線圖';
     if(s1) s1.textContent = '三口袋月度淨利' + level + upline;
     if(s2) s2.textContent = 'TikTok + IG 月度粉絲' + level + upline;
+    // Profile badge
+    const cb=document.getElementById('curveProfileBadge');
+    const ct=document.getElementById('curveProfileText');
+    if(cb&&ct){
+        const parts=[name,p.level,p.upline?'上家：'+p.upline:''].filter(Boolean);
+        if(parts.length){ ct.innerText=parts.join(' · '); cb.style.display='flex'; }
+        else cb.style.display='none';
+    }
 }
 
 function getCurveSortedKeys(){ return Object.keys(curveDB).sort(); }
