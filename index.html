@@ -384,64 +384,57 @@
 
 <!-- 曲線圖 -->
 <div id="tab-curve" class="container">
-    <!-- Sub tabs -->
-    <div class="curve-sub-tabs">
-        <button class="curve-sub-tab active" onclick="switchCurve('curve-input',this)">➕ 資料輸入</button>
-        <button class="curve-sub-tab" onclick="switchCurve('curve-fans',this)">✨ 魔術曲線圖</button>
+    <!-- 標題設定 -->
+    <div class="card">
+        <div class="card-header">圖表標題設定</div>
+        <div class="input-group" style="margin-bottom:0;"><span class="input-label">年份範圍（例：2023-2025）</span>
+            <input type="text" id="cfg-years" class="custom-input" placeholder="例：2023-2025" oninput="saveCurveConfig()">
+        </div>
+        <div style="font-size:.73rem;color:var(--text-muted);margin-top:8px;">姓名和級別請在「設定」頁填寫，會自動同步到圖表標題。</div>
     </div>
 
-    <!-- 資料輸入 -->
-    <div class="curve-panel active" id="curve-input">
-        <div class="card">
-            <div class="card-header">圖表標題設定</div>
-            <div class="input-group"><span class="input-label">年份範圍（例：2023-2025）</span>
-                <input type="text" id="cfg-years" class="custom-input" placeholder="例：2023-2025" oninput="saveCurveConfig()">
-            </div>
-            <div style="font-size:.75rem;color:var(--text-muted);">姓名和級別請在「設定」頁填寫，會自動同步到圖表標題。</div>
+    <!-- 圖表 -->
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;" id="curve-stats2"></div>
+    <div class="card">
+        <div class="card-header" id="curve-chart2-title">魔術曲線圖</div>
+        <div style="font-size:.73rem;color:var(--text-muted);margin-bottom:10px;" id="curve-chart2-sub">TikTok + IG 月度粉絲堆疊長條圖</div>
+        <div class="curve-legend">
+            <div class="curve-legend-item"><div class="curve-legend-box" style="background:#5BC8C0"></div>TikTok</div>
+            <div class="curve-legend-item"><div class="curve-legend-box" style="background:var(--rose)"></div>IG</div>
         </div>
-        <div class="card">
-            <div class="card-header">新增月份資料</div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">
-                <div class="input-group" style="margin-bottom:0;">
-                    <span class="input-label">年份</span>
-                    <div style="position:relative;"><select id="curve-year" class="month-select" style="font-size:.85rem;padding:10px 30px 10px 12px;"></select><span style="position:absolute;right:10px;top:50%;transform:translateY(-50%);color:var(--rose);pointer-events:none;font-size:.8rem;">▾</span></div>
-                </div>
-                <div class="input-group" style="margin-bottom:0;">
-                    <span class="input-label">月份</span>
-                    <div style="position:relative;"><select id="curve-month" class="month-select" style="font-size:.85rem;padding:10px 30px 10px 12px;">
-                        <option value="1">1月</option><option value="2">2月</option><option value="3">3月</option><option value="4">4月</option>
-                        <option value="5">5月</option><option value="6">6月</option><option value="7">7月</option><option value="8">8月</option>
-                        <option value="9">9月</option><option value="10">10月</option><option value="11">11月</option><option value="12">12月</option>
-                    </select><span style="position:absolute;right:10px;top:50%;transform:translateY(-50%);color:var(--rose);pointer-events:none;font-size:.8rem;">▾</span></div>
-                </div>
-            </div>
-            <div style="font-size:.75rem;font-weight:600;color:var(--text-sub);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px;">👥 粉絲</div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;">
-                <div class="input-group" style="margin-bottom:0;"><span class="input-label" style="color:#5BC8C0;">TikTok</span><input type="number" id="cv-tiktok" class="custom-input" placeholder="0" style="border-left:3px solid #5BC8C0;"></div>
-                <div class="input-group" style="margin-bottom:0;"><span class="input-label" style="color:var(--rose);">IG</span><input type="number" id="cv-ig" class="custom-input" placeholder="0" style="border-left:3px solid var(--rose);"></div>
-            </div>
-            <button class="save-btn" onclick="addCurveMonth()">＋ 新增這個月</button>
-        </div>
-        <div class="card">
-            <div class="card-header">月份資料（直接修改自動儲存）</div>
-            <div id="curve-edit-table"></div>
-        </div>
+        <div class="chart-wrap-curve"><canvas id="curve-chart2"></canvas></div>
+        <div style="font-size:.72rem;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin:14px 0 8px;padding-top:14px;border-top:1px solid var(--border);">📋 月份明細</div>
+        <div id="curve-table2"></div>
     </div>
 
-    <!-- 粉絲圖 -->
-    <div class="curve-panel" id="curve-fans">
-        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;" id="curve-stats2"></div>
-        <div class="card">
-            <div class="card-header" id="curve-chart2-title">粉絲曲線圖</div>
-            <div style="font-size:.73rem;color:var(--text-muted);margin-bottom:10px;" id="curve-chart2-sub">TikTok + IG 月度粉絲堆疊長條圖</div>
-            <div class="curve-legend">
-                <div class="curve-legend-item"><div class="curve-legend-box" style="background:#5BC8C0"></div>TikTok</div>
-                <div class="curve-legend-item"><div class="curve-legend-box" style="background:var(--rose)"></div>IG</div>
+    <!-- 新增月份 -->
+    <div class="card">
+        <div class="card-header">新增月份資料</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">
+            <div class="input-group" style="margin-bottom:0;">
+                <span class="input-label">年份</span>
+                <div style="position:relative;"><select id="curve-year" class="month-select" style="font-size:.85rem;padding:10px 30px 10px 12px;"></select><span style="position:absolute;right:10px;top:50%;transform:translateY(-50%);color:var(--rose);pointer-events:none;font-size:.8rem;">▾</span></div>
             </div>
-            <div class="chart-wrap-curve"><canvas id="curve-chart2"></canvas></div>
-            <div style="font-size:.72rem;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin:14px 0 8px;padding-top:14px;border-top:1px solid var(--border);">📋 月份明細</div>
-            <div id="curve-table2"></div>
+            <div class="input-group" style="margin-bottom:0;">
+                <span class="input-label">月份</span>
+                <div style="position:relative;"><select id="curve-month" class="month-select" style="font-size:.85rem;padding:10px 30px 10px 12px;">
+                    <option value="1">1月</option><option value="2">2月</option><option value="3">3月</option><option value="4">4月</option>
+                    <option value="5">5月</option><option value="6">6月</option><option value="7">7月</option><option value="8">8月</option>
+                    <option value="9">9月</option><option value="10">10月</option><option value="11">11月</option><option value="12">12月</option>
+                </select><span style="position:absolute;right:10px;top:50%;transform:translateY(-50%);color:var(--rose);pointer-events:none;font-size:.8rem;">▾</span></div>
+            </div>
         </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;">
+            <div class="input-group" style="margin-bottom:0;"><span class="input-label" style="color:#5BC8C0;">TikTok 粉絲數</span><input type="number" id="cv-tiktok" class="custom-input" placeholder="0" style="border-left:3px solid #5BC8C0;"></div>
+            <div class="input-group" style="margin-bottom:0;"><span class="input-label" style="color:var(--rose);">IG 粉絲數</span><input type="number" id="cv-ig" class="custom-input" placeholder="0" style="border-left:3px solid var(--rose);"></div>
+        </div>
+        <button class="save-btn" onclick="addCurveMonth()">＋ 新增這個月</button>
+    </div>
+
+    <!-- 編輯表格 -->
+    <div class="card">
+        <div class="card-header">月份資料（直接修改自動儲存）</div>
+        <div id="curve-edit-table"></div>
     </div>
 </div>
 
@@ -1115,7 +1108,7 @@ function switchCurve(panelId, el){
     document.querySelectorAll('.curve-panel').forEach(p=>p.classList.remove('active'));
     el.classList.add('active');
     document.getElementById(panelId).classList.add('active');
-    if(panelId!=='curve-input') renderCurveCharts();
+    renderCurveCharts();
 }
 
 function addCurveMonth(){
